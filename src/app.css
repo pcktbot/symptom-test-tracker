@@ -61,15 +61,15 @@
   --color-border-strong: #d1d5db;
   --color-surface: #ffffff;
   --color-surface-raised: #f9fafb;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-flag-high: #d97706;
+  --color-accent: #2E6171;
+  --color-accent-hover: #173038;
+  --color-flag-high: #F4B942;
   --color-flag-low: #2563eb;
-  --color-flag-critical: #dc2626;
-  --color-flag-normal: #16a34a;
-  --color-success: #16a34a;
-  --color-warning: #d97706;
-  --color-danger: #dc2626;
+  --color-flag-critical: #7B0828;
+  --color-flag-normal: #7FB069;
+  --color-success: #7FB069;
+  --color-warning: #F4B942;
+  --color-danger: #7B0828;
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --radius: 6px;
@@ -185,3 +185,31 @@ h3 { font-size: 15px; font-weight: 600; }
 .badge.flag-high { background: #fffbeb; }
 .badge.flag-low { background: #eff6ff; }
 .badge.flag-normal { background: #f0fdf4; }
+
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: none;
+  font-size: 10px;
+  font-weight: 600;
+  font-style: italic;
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+  vertical-align: middle;
+}
+
+.info-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: none;
+}
