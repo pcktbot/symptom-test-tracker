@@ -115,6 +115,7 @@ export const LAB_PANELS: PanelDefinition[] = [
       { name: 'Alkaline Phosphatase', unit: 'U/L', ref_low: 44, ref_high: 147 },
       { name: 'Total Bilirubin', unit: 'mg/dL', ref_low: 0.1, ref_high: 1.2 },
       { name: 'Albumin', unit: 'g/dL', ref_low: 3.5, ref_high: 5.0 },
+      { name: 'Uric Acid', unit: 'mg/dL', ref_low: 2.5, ref_high: 7.0 },
     ],
   },
   {

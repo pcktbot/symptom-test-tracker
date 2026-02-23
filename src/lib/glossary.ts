@@ -72,6 +72,7 @@ export const GLOSSARY: GlossaryEntry[] = [
   { name: 'Alkaline Phosphatase', panel: 'Metabolic / BMP', description: 'Enzyme found in liver, bone, and bile ducts.', clinical: 'Elevated in cholestatic liver disease. Less commonly affected by typical lupus medications.' },
   { name: 'Total Bilirubin', panel: 'Metabolic / BMP', description: 'Breakdown product of hemoglobin. Processed by the liver.', clinical: 'Elevated in hemolytic anemia (common in lupus) or liver dysfunction.' },
   { name: 'Albumin', panel: 'Metabolic / BMP', description: 'Major blood protein made by the liver. Maintains blood volume and carries substances.', clinical: 'Low in nephrotic syndrome from lupus nephritis (lost in urine), chronic inflammation, or liver disease.' },
+  { name: 'Uric Acid', panel: 'Metabolic / BMP', description: 'End product of purine metabolism, filtered by the kidneys.', clinical: 'Elevated levels can indicate impaired kidney function, a side effect of certain diuretics, or increased cell turnover. Relevant in lupus for monitoring renal involvement and medication effects.' },
 
   // Thyroid
   { name: 'TSH', panel: 'Thyroid', description: 'Thyroid-stimulating hormone. Pituitary hormone that controls thyroid function.', clinical: 'Autoimmune thyroid disease (Hashimoto\'s) frequently co-occurs with lupus. High TSH indicates hypothyroidism.' },
