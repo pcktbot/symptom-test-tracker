@@ -19,9 +19,9 @@
   });
 
   $effect(() => {
-    if (activeTest && activeEl) {
+    if (activeTest && activeEl && Object.keys(grouped).length > 0) {
       tick().then(() => {
-        const el = document.getElementById(`glossary-${CSS.escape(activeTest!)}`);
+        const el = document.getElementById(`glossary-${activeTest}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el.classList.add('highlight');

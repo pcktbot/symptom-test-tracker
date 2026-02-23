@@ -34,6 +34,8 @@ pub fn run() {
             commands::symptoms::get_symptom_log,
             commands::symptoms::save_symptom_log,
             commands::export::export_data,
+            commands::settings::get_setting,
+            commands::settings::set_setting,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

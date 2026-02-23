@@ -103,6 +103,15 @@ export async function saveSymptomLog(
   return invoke('save_symptom_log', { date, entries, wellness, notes });
 }
 
+// Settings
+export async function getSetting(key: string): Promise<string> {
+  return invoke('get_setting', { key });
+}
+
+export async function setSetting(key: string, value: string): Promise<void> {
+  return invoke('set_setting', { key, value });
+}
+
 // Export
 export async function exportData(
   startDate: string,

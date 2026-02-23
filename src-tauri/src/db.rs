@@ -82,6 +82,13 @@ impl Database {
                 clinical TEXT NOT NULL DEFAULT ''
             );
 
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL DEFAULT ''
+            );
+
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('mcp_enabled', 'true');
+
             CREATE INDEX IF NOT EXISTS idx_lab_results_session ON lab_results(session_id);
             CREATE INDEX IF NOT EXISTS idx_lab_results_test ON lab_results(test_name);
             CREATE INDEX IF NOT EXISTS idx_symptom_logs_date ON symptom_logs(log_date);

@@ -20,6 +20,19 @@ fn open_db() -> Result<Connection, McpError> {
         .map_err(|e| McpError::internal_error(format!("Failed to open database: {}", e), None))
 }
 
+fn check_enabled(conn: &Connection) -> Result<(), McpError> {
+    let enabled: String = conn
+        .query_row("SELECT value FROM settings WHERE key = 'mcp_enabled'", [], |r| r.get(0))
+        .unwrap_or_default();
+    if enabled != "true" {
+        return Err(McpError::internal_error(
+            "MCP access is currently disabled in the Symptom Tracker app. Open the app → Settings to re-enable.".to_string(),
+            None,
+        ));
+    }
+    Ok(())
+}
+
 // Parameter structs
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
 pub struct DaysParam {
@@ -106,6 +119,7 @@ impl TrackerMcp {
         Parameters(DaysParam { days }): Parameters<DaysParam>,
     ) -> Result<CallToolResult, McpError> {
         let conn = open_db()?;
+        check_enabled(&conn)?;
         let mut stmt = conn.prepare(
             "SELECT id, test_date, lab_name, notes FROM lab_sessions
              WHERE test_date >= date('now', '-' || ?1 || ' days')
@@ -151,6 +165,7 @@ impl TrackerMcp {
     #[tool(description = "Get all currently flagged abnormal lab values (latest result per test where flag is not normal)")]
     fn get_abnormal_labs(&self) -> Result<CallToolResult, McpError> {
         let conn = open_db()?;
+        check_enabled(&conn)?;
         let mut stmt = conn.prepare(
             "SELECT r.test_name, r.panel, r.value, r.text_value, r.unit,
                     r.ref_range_low, r.ref_range_high, r.flag, s.test_date
@@ -206,6 +221,7 @@ impl TrackerMcp {
         Parameters(DaysParam { days }): Parameters<DaysParam>,
     ) -> Result<CallToolResult, McpError> {
         let conn = open_db()?;
+        check_enabled(&conn)?;
         let mut dstmt = conn.prepare(
             "SELECT DISTINCT log_date FROM symptom_logs
              WHERE log_date >= date('now', '-' || ?1 || ' days')
@@ -258,6 +274,7 @@ impl TrackerMcp {
         Parameters(TrendsParam { test_name, days }): Parameters<TrendsParam>,
     ) -> Result<CallToolResult, McpError> {
         let conn = open_db()?;
+        check_enabled(&conn)?;
         let mut stmt = conn.prepare(
             "SELECT s.test_date, r.value, r.text_value, r.flag
              FROM lab_results r
@@ -289,6 +306,7 @@ impl TrackerMcp {
         Parameters(DaysParam { days }): Parameters<DaysParam>,
     ) -> Result<CallToolResult, McpError> {
         let conn = open_db()?;
+        check_enabled(&conn)?;
         let mut stmt = conn.prepare(
             "SELECT log_date, wellness_score, notes FROM daily_summaries
              WHERE log_date >= date('now', '-' || ?1 || ' days')

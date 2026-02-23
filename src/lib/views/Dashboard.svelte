@@ -8,6 +8,9 @@
 
   let abnormals: AbnormalResult[] = $state([]);
   let loading = $state(true);
+  let fontSize = $state(13);
+  const FONT_MIN = 11;
+  const FONT_MAX = 18;
 
   onMount(async () => {
     try {
@@ -65,7 +68,13 @@
 <div class="dashboard">
   <div class="header">
     <h1>Dashboard</h1>
-    <button class="primary" onclick={() => onNavigate('lab-entry')}>+ New Lab Entry</button>
+    <div class="header-actions">
+      <div class="size-controls">
+        <button class="size-btn" onclick={() => fontSize = Math.max(FONT_MIN, fontSize - 1)} disabled={fontSize <= FONT_MIN}>-</button>
+        <button class="size-btn" onclick={() => fontSize = Math.min(FONT_MAX, fontSize + 1)} disabled={fontSize >= FONT_MAX}>+</button>
+      </div>
+      <button class="primary" onclick={() => onNavigate('lab-entry')}>+ New Lab Entry</button>
+    </div>
   </div>
 
   {#if loading}
@@ -81,7 +90,7 @@
     {#each Object.entries(grouped) as [panel, results]}
       <div class="panel-group">
         <h3>{panel}</h3>
-        <table>
+        <table style="font-size: {fontSize}px">
           <thead>
             <tr>
               <th>Test</th>
@@ -150,6 +159,51 @@
     margin-bottom: 20px;
   }
 
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .size-controls {
+    display: flex;
+  }
+
+  .size-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .size-btn:first-child {
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+
+  .size-btn:last-child {
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-left: -1px;
+  }
+
+  .size-btn:hover:not(:disabled) {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+  }
+
+  .size-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
   .summary {
     color: var(--color-text-muted);
     margin-bottom: 16px;
@@ -179,7 +233,6 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
   }
 
   th {
@@ -191,6 +244,10 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     border-bottom: 1px solid var(--color-border);
+  }
+
+  tbody tr:nth-child(even) {
+    background: #f9fafb;
   }
 
   td {
