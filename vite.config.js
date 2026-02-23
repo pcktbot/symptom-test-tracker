@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
@@ -27,6 +28,21 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
+    },
+  },
+  test: {
+    include: ['src/**/*.{test,spec}.{js,ts}'],
+    environment: 'node',
+    alias: {
+      '$lib': '/src/lib',
+      '$lib/': '/src/lib/',
+    },
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      include: ['src/lib/**/*.ts'],
+      exclude: ['src/lib/db.ts', 'src/**/*.test.ts', 'src/**/*.spec.ts'],
     },
   },
 }));

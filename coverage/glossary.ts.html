@@ -1,0 +1,451 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for glossary.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="index.html">All files</a> glossary.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>20/20</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">90% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>9/10</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>5/5</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>15/15</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">303x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">520x</span>
+<span class="cline-any cline-yes">520x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export interface GlossaryEntry {
+  name: string;
+  panel: string;
+  description: string;
+  clinical: string;
+}
+&nbsp;
+export const GLOSSARY: GlossaryEntry[] = [
+  // CBC
+  { name: 'WBC', panel: 'CBC', description: 'White blood cell count. Measures the total number of infection-fighting cells in blood.', clinical: 'Elevated in infection, inflammation, or steroid use. Low in lupus flares, immunosuppressive therapy, or bone marrow suppression.' },
+  { name: 'RBC', panel: 'CBC', description: 'Red blood cell count. Measures oxygen-carrying cells.', clinical: 'Low in anemia of chronic disease, common in lupus. May indicate hemolysis if paired with positive Coombs test.' },
+  { name: 'Hemoglobin', panel: 'CBC', description: 'Protein in red blood cells that carries oxygen.', clinical: 'Low hemoglobin (anemia) is common in SLE. Can result from chronic inflammation, kidney disease, or autoimmune hemolytic anemia.' },
+  { name: 'Hematocrit', panel: 'CBC', description: 'Percentage of blood volume occupied by red blood cells.', clinical: 'Tracks with hemoglobin. Low values confirm anemia.' },
+  { name: 'MCV', panel: 'CBC', description: 'Mean corpuscular volume. Average size of red blood cells.', clinical: 'High MCV suggests B12/folate deficiency or certain medications. Low MCV suggests iron deficiency.' },
+  { name: 'MCH', panel: 'CBC', description: 'Mean corpuscular hemoglobin. Average amount of hemoglobin per red blood cell.', clinical: 'Helps classify anemia type alongside MCV.' },
+  { name: 'MCHC', panel: 'CBC', description: 'Mean corpuscular hemoglobin concentration. Average concentration of hemoglobin in red blood cells.', clinical: 'Low in iron deficiency anemia. Elevated in spherocytosis.' },
+  { name: 'RDW', panel: 'CBC', description: 'Red cell distribution width. Measures variation in red blood cell size.', clinical: 'Elevated in iron deficiency, B12 deficiency, or mixed anemias. Can be high during active hemolysis.' },
+  { name: 'Platelets', panel: 'CBC', description: 'Cell fragments essential for blood clotting.', clinical: 'Low platelets (thrombocytopenia) is common in lupus and a criterion for APS. Can indicate immune-mediated destruction.' },
+  { name: 'Neutrophils', panel: 'CBC', description: 'Most abundant white blood cell type. First responders to bacterial infection.', clinical: 'Low in active lupus (neutropenia). Immunosuppressive drugs can also lower counts.' },
+  { name: 'Lymphocytes', panel: 'CBC', description: 'White blood cells central to adaptive immunity (T cells, B cells).', clinical: 'Lymphopenia (&lt;1000) is a diagnostic criterion for SLE and correlates with disease activity.' },
+  { name: 'Monocytes', panel: 'CBC', description: 'White blood cells that become macrophages in tissues.', clinical: 'Generally less specific in lupus monitoring but can be elevated in chronic inflammation.' },
+  { name: 'Eosinophils', panel: 'CBC', description: 'White blood cells involved in allergic responses and parasitic infections.', clinical: 'Usually normal in lupus. Elevation may suggest drug reaction or concurrent allergic condition.' },
+  { name: 'Basophils', panel: 'CBC', description: 'Rarest white blood cell type. Involved in allergic and inflammatory responses.', clinical: 'Rarely significant in lupus monitoring.' },
+&nbsp;
+  // Lipids
+  { name: 'Total Cholesterol', panel: 'Lipids', description: 'Sum of all cholesterol types in blood.', clinical: 'Lupus and chronic inflammation can affect lipid metabolism. Steroids often raise cholesterol.' },
+  { name: 'LDL', panel: 'Lipids', description: 'Low-density lipoprotein. "Bad" cholesterol that builds up in artery walls.', clinical: 'Often elevated by corticosteroid use. APS patients have increased cardiovascular risk, making LDL management important.' },
+  { name: 'HDL', panel: 'Lipids', description: 'High-density lipoprotein. "Good" cholesterol that helps remove LDL.', clinical: 'Often low in active lupus. Low HDL combined with APS increases thrombotic risk.' },
+  { name: 'Triglycerides', panel: 'Lipids', description: 'Fat molecules in the blood, major energy source.', clinical: 'Can be elevated by steroids, kidney disease, or metabolic syndrome in lupus patients.' },
+  { name: 'VLDL', panel: 'Lipids', description: 'Very low-density lipoprotein. Carries triglycerides from liver to tissues.', clinical: 'Calculated from triglycerides. Elevated alongside triglycerides.' },
+  { name: 'Non-HDL', panel: 'Lipids', description: 'Total cholesterol minus HDL. Captures all atherogenic lipoproteins.', clinical: 'Better predictor of cardiovascular risk than LDL alone, especially relevant for APS patients.' },
+&nbsp;
+  // Inflammation
+  { name: 'CRP', panel: 'Inflammation', description: 'C-reactive protein. Acute-phase protein produced by the liver in response to inflammation.', clinical: 'Useful for tracking infection and inflammation. In lupus, CRP may be only mildly elevated during flares (unlike in infection where it rises sharply).' },
+  { name: 'ESR', panel: 'Inflammation', description: 'Erythrocyte sedimentation rate. Measures how quickly red blood cells settle in a tube.', clinical: 'Elevated in active lupus and tracks with disease activity. Less specific than CRP but useful for trend monitoring.' },
+  { name: 'Ferritin', panel: 'Inflammation', description: 'Iron storage protein. Also an acute-phase reactant.', clinical: 'Can be elevated in inflammation regardless of iron status. Very high levels may suggest macrophage activation syndrome, a serious lupus complication.' },
+  { name: 'Fibrinogen', panel: 'Inflammation', description: 'Clotting protein and acute-phase reactant.', clinical: 'Elevated in inflammation. Consumed during active clotting (DIC), which can occur in severe APS.' },
+  { name: 'IL-6', panel: 'Inflammation', description: 'Interleukin-6. Pro-inflammatory cytokine.', clinical: 'Elevated in active lupus. Drives CRP production and B cell activation. Not routinely tested but useful for research or refractory cases.' },
+  { name: 'Procalcitonin', panel: 'Inflammation', description: 'Precursor to calcitonin hormone. Rises specifically in bacterial infection.', clinical: 'Helps distinguish infection from lupus flare — procalcitonin rises in infection but typically stays low in flares.' },
+&nbsp;
+  // Lupus/APS Markers
+  { name: 'ANA', panel: 'Lupus/APS Markers', description: 'Antinuclear antibodies. Autoantibodies that target components of cell nuclei.', clinical: 'Positive in &gt;95% of lupus patients. Reported as titer (1:80, 1:160, etc.) and pattern (homogeneous, speckled, nucleolar). High titers are more specific. A negative ANA nearly rules out SLE.' },
+  { name: 'Anti-dsDNA', panel: 'Lupus/APS Markers', description: 'Antibodies against double-stranded DNA.', clinical: 'Highly specific for SLE. Levels correlate with disease activity, especially lupus nephritis. Rising titers often predict flares.' },
+  { name: 'Anti-Smith', panel: 'Lupus/APS Markers', description: 'Antibodies against Smith antigen (snRNP proteins).', clinical: 'Highly specific for SLE (99%) but only present in 20-30% of patients. Levels do not correlate with disease activity.' },
+  { name: 'Anti-SSA/Ro', panel: 'Lupus/APS Markers', description: 'Antibodies against Ro/SSA ribonucleoprotein.', clinical: 'Associated with photosensitivity, neonatal lupus, and Sjogren syndrome overlap. Important in pregnancy planning — can cause congenital heart block.' },
+  { name: 'Anti-SSB/La', panel: 'Lupus/APS Markers', description: 'Antibodies against La/SSB ribonucleoprotein.', clinical: 'Usually appears with Anti-SSA. Strong association with Sjogren syndrome. Less common in SLE alone.' },
+  { name: 'Anti-Scl-70', panel: 'Lupus/APS Markers', description: 'Antibodies against topoisomerase I.', clinical: 'Primarily associated with diffuse systemic sclerosis. Presence in lupus may suggest overlap syndrome.' },
+  { name: 'Anti-Jo-1', panel: 'Lupus/APS Markers', description: 'Antibodies against histidyl-tRNA synthetase.', clinical: 'Associated with antisynthetase syndrome and polymyositis. Presence suggests myositis overlap.' },
+  { name: 'C3', panel: 'Lupus/APS Markers', description: 'Complement component 3. Part of the innate immune system that enhances pathogen clearance.', clinical: 'Low C3 indicates complement consumption from active immune complex disease. Tracks closely with lupus nephritis activity.' },
+  { name: 'C4', panel: 'Lupus/APS Markers', description: 'Complement component 4. Early classical pathway protein.', clinical: 'Often the first complement to drop in lupus flares. Some patients have genetic C4 deficiency (C4A null allele), causing a persistently low baseline.' },
+  { name: 'CH50', panel: 'Lupus/APS Markers', description: 'Total hemolytic complement. Functional assay of the entire classical complement pathway.', clinical: 'Low when any complement component is deficient or consumed. Useful for confirming complement activation in active lupus.' },
+  { name: 'Anticardiolipin IgG', panel: 'Lupus/APS Markers', description: 'IgG antibodies against cardiolipin, a phospholipid in cell membranes.', clinical: 'One of the three criteria antibodies for antiphospholipid syndrome. Must be present at medium-to-high titer. Persistent positivity (12+ weeks apart) is required for APS diagnosis.' },
+  { name: 'Anticardiolipin IgM', panel: 'Lupus/APS Markers', description: 'IgM antibodies against cardiolipin.', clinical: 'Part of APS criteria. IgM is less specific than IgG and can be transiently positive in infections.' },
+  { name: 'Beta-2 Glycoprotein I IgG', panel: 'Lupus/APS Markers', description: 'IgG antibodies against beta-2 glycoprotein I, a phospholipid-binding protein.', clinical: 'Considered the most specific antiphospholipid antibody for APS. Strong association with thrombotic events.' },
+  { name: 'Beta-2 Glycoprotein I IgM', panel: 'Lupus/APS Markers', description: 'IgM antibodies against beta-2 glycoprotein I.', clinical: 'Part of the APS antibody panel. Less specific than IgG but still included in diagnostic criteria.' },
+  { name: 'Lupus Anticoagulant', panel: 'Lupus/APS Markers', description: 'Functional coagulation assay detecting antibodies that prolong phospholipid-dependent clotting in vitro.', clinical: 'Paradoxically, despite prolonging clotting tests in the lab, it is the strongest predictor of thrombosis among APS antibodies. Reported as positive/negative.' },
+  { name: 'Direct Coombs', panel: 'Lupus/APS Markers', description: 'Detects antibodies or complement bound to the surface of red blood cells.', clinical: 'Positive in autoimmune hemolytic anemia (AIHA), which can occur in SLE. A positive Coombs without overt hemolysis counts as a diagnostic criterion.' },
+  { name: 'Urine Protein/Creatinine', panel: 'Lupus/APS Markers', description: 'Ratio of protein to creatinine in a spot urine sample. Estimates 24-hour protein excretion.', clinical: 'Key marker for lupus nephritis. Ratio &gt;0.5 (500 mg/g) suggests significant proteinuria. Serial monitoring guides treatment response.' },
+&nbsp;
+  // Metabolic / BMP
+  { name: 'Sodium', panel: 'Metabolic / BMP', description: 'Electrolyte critical for fluid balance, nerve, and muscle function.', clinical: 'Can be low (SIADH) in active lupus or from certain medications.' },
+  { name: 'Potassium', panel: 'Metabolic / BMP', description: 'Electrolyte essential for heart rhythm and muscle contraction.', clinical: 'Monitor closely with kidney disease or when on ACE inhibitors, ARBs, or certain immunosuppressants.' },
+  { name: 'Chloride', panel: 'Metabolic / BMP', description: 'Electrolyte that helps maintain acid-base balance.', clinical: 'Usually tracks with sodium. Abnormal in acid-base disorders.' },
+  { name: 'CO2', panel: 'Metabolic / BMP', description: 'Bicarbonate level. Reflects acid-base status.', clinical: 'Low in metabolic acidosis, which can occur with kidney disease in lupus nephritis.' },
+  { name: 'BUN', panel: 'Metabolic / BMP', description: 'Blood urea nitrogen. Waste product filtered by kidneys.', clinical: 'Elevated in kidney dysfunction. Important for monitoring lupus nephritis.' },
+  { name: 'Creatinine', panel: 'Metabolic / BMP', description: 'Waste product from muscle metabolism, filtered by kidneys.', clinical: 'Most important single marker for kidney function. Rising creatinine in lupus may indicate nephritis progression.' },
+  { name: 'eGFR', panel: 'Metabolic / BMP', description: 'Estimated glomerular filtration rate. Calculated measure of kidney filtering capacity.', clinical: 'Below 60 indicates chronic kidney disease. Serial monitoring is critical in lupus nephritis.' },
+  { name: 'Glucose', panel: 'Metabolic / BMP', description: 'Blood sugar level.', clinical: 'Corticosteroids commonly cause elevated glucose. Monitor for steroid-induced diabetes.' },
+  { name: 'Calcium', panel: 'Metabolic / BMP', description: 'Mineral essential for bones, muscle contraction, and nerve signaling.', clinical: 'Can be affected by kidney disease or vitamin D deficiency, both common in lupus.' },
+  { name: 'ALT', panel: 'Metabolic / BMP', description: 'Alanine aminotransferase. Liver enzyme most specific for liver cell damage.', clinical: 'Monitor for hepatotoxicity from methotrexate, azathioprine, or other immunosuppressants.' },
+  { name: 'AST', panel: 'Metabolic / BMP', description: 'Aspartate aminotransferase. Enzyme found in liver and muscle.', clinical: 'Elevated alongside ALT in drug-induced liver injury. Can also rise from muscle inflammation (myositis).' },
+  { name: 'Alkaline Phosphatase', panel: 'Metabolic / BMP', description: 'Enzyme found in liver, bone, and bile ducts.', clinical: 'Elevated in cholestatic liver disease. Less commonly affected by typical lupus medications.' },
+  { name: 'Total Bilirubin', panel: 'Metabolic / BMP', description: 'Breakdown product of hemoglobin. Processed by the liver.', clinical: 'Elevated in hemolytic anemia (common in lupus) or liver dysfunction.' },
+  { name: 'Albumin', panel: 'Metabolic / BMP', description: 'Major blood protein made by the liver. Maintains blood volume and carries substances.', clinical: 'Low in nephrotic syndrome from lupus nephritis (lost in urine), chronic inflammation, or liver disease.' },
+  { name: 'Uric Acid', panel: 'Metabolic / BMP', description: 'End product of purine metabolism, filtered by the kidneys.', clinical: 'Elevated levels can indicate impaired kidney function, a side effect of certain diuretics, or increased cell turnover. Relevant in lupus for monitoring renal involvement and medication effects.' },
+&nbsp;
+  // Thyroid
+  { name: 'TSH', panel: 'Thyroid', description: 'Thyroid-stimulating hormone. Pituitary hormone that controls thyroid function.', clinical: 'Autoimmune thyroid disease (Hashimoto\'s) frequently co-occurs with lupus. High TSH indicates hypothyroidism.' },
+  { name: 'Free T4', panel: 'Thyroid', description: 'Free thyroxine. Active thyroid hormone available to tissues.', clinical: 'Low with high TSH confirms hypothyroidism. Thyroid function should be checked periodically in lupus patients.' },
+  { name: 'Free T3', panel: 'Thyroid', description: 'Free triiodothyronine. Most active thyroid hormone.', clinical: 'Can be low in chronic illness ("sick euthyroid") even with normal TSH. Less useful for routine monitoring.' },
+  { name: 'TPO Antibodies', panel: 'Thyroid', description: 'Thyroid peroxidase antibodies. Autoantibodies against thyroid enzyme.', clinical: 'Positive in Hashimoto\'s thyroiditis. Lupus patients have a higher prevalence of thyroid autoimmunity.' },
+&nbsp;
+  // Coagulation
+  { name: 'PT', panel: 'Coagulation', description: 'Prothrombin time. Measures extrinsic and common clotting pathway function.', clinical: 'Can be prolonged by warfarin therapy (common in APS) or liver disease.' },
+  { name: 'INR', panel: 'Coagulation', description: 'International normalized ratio. Standardized PT result for monitoring anticoagulation.', clinical: 'Target INR for APS patients on warfarin is typically 2.0-3.0 (or 2.5-3.5 for arterial events). Critical for preventing recurrent thrombosis.' },
+  { name: 'aPTT', panel: 'Coagulation', description: 'Activated partial thromboplastin time. Measures intrinsic and common clotting pathway.', clinical: 'Paradoxically prolonged by lupus anticoagulant in vitro despite increased clotting risk in vivo. Used as part of lupus anticoagulant testing.' },
+];
+&nbsp;
+import type { CustomLabTest } from './types';
+import { getCustomLabTests } from './db';
+&nbsp;
+export function getGlossaryEntry(testName: string): GlossaryEntry | undefined {
+  return GLOSSARY.find(e =&gt; e.name === testName);
+}
+&nbsp;
+export function getGlossaryByPanel(): Record&lt;string, GlossaryEntry[]&gt; {
+  const groups: Record&lt;string, GlossaryEntry[]&gt; = {};
+  for (const entry of GLOSSARY) {
+    if (!groups[entry.panel]) groups[entry.panel] = [];
+    groups[entry.panel].push(entry);
+  }
+  return groups;
+}
+&nbsp;
+export async function getMergedGlossary(): Promise&lt;Record&lt;string, GlossaryEntry[]&gt;&gt; {
+  const groups = getGlossaryByPanel();
+  const custom = await getCustomLabTests();
+  for (const ct of custom) {
+    if (!ct.description &amp;&amp; !ct.clinical) continue;
+    if (!groups[ct.panel]) groups[ct.panel] = [];
+    // Only add if not already present
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (!groups[ct.panel].some(e =&gt; e.name === ct.name)) {
+      groups[ct.panel].push({
+        name: ct.name,
+        panel: ct.panel,
+        description: ct.description,
+        clinical: ct.clinical,
+      });
+    }
+  }
+  return groups;
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-02-23T16:41:13.640Z
+            </div>
+        <script src="prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="sorter.js"></script>
+        <script src="block-navigation.js"></script>
+    </body>
+</html>
+    
