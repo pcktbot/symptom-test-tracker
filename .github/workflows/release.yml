@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    if: github.event.pull_request.merged == true
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: echo "tag=v$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ steps.version.outputs.tag }}
+          releaseName: Symptom Test Tracker ${{ steps.version.outputs.tag }}
+          releaseBody: "See the assets below to download the installer."
+          releaseDraft: true
+          prerelease: false
+
+      - name: Build MCP server binary
+        run: cargo build --release --manifest-path src-tauri/Cargo.toml --bin mcp-server
+
+      - name: Upload MCP binary to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: src-tauri/target/release/mcp-server
+          draft: true
