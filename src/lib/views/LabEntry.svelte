@@ -1,16 +1,17 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { getLabSession, saveLabSession } from '$lib/db';
-  import { todayString, LAB_PANELS } from '$lib/utils';
-  import type { LabSession, LabResult, View } from '$lib/types';
+  import { todayString, getMergedPanels } from '$lib/utils';
+  import type { LabSession, LabResult, PanelDefinition, View } from '$lib/types';
 
-  let { sessionId = null, onNavigate }: { sessionId: number | null; onNavigate: (view: View) => void } = $props();
+  let { sessionId = null, onNavigate, openGlossary }: { sessionId: number | null; onNavigate: (view: View) => void; openGlossary: (testName?: string) => void } = $props();
 
   let testDate = $state(todayString());
   let labName = $state('');
   let notes = $state('');
   let saving = $state(false);
   let expandedPanels: Record<string, boolean> = $state({});
+  let panels: PanelDefinition[] = $state([]);
 
   // Store result values keyed by test name
   let resultValues: Record<string, {
@@ -25,8 +26,11 @@
   }> = $state({});
 
   onMount(async () => {
+    // Load panels (built-in + custom)
+    panels = await getMergedPanels();
+
     // Initialize all test fields with defaults from panel definitions
-    for (const panel of LAB_PANELS) {
+    for (const panel of panels) {
       for (const test of panel.tests) {
         resultValues[test.name] = {
           value: '',
@@ -154,7 +158,7 @@
   </div>
 
   <div class="panels">
-    {#each LAB_PANELS as panel}
+    {#each panels as panel}
       <div class="panel">
         <button class="panel-header" onclick={() => togglePanel(panel.name)}>
           <span class="panel-toggle">{expandedPanels[panel.name] ? '-' : '+'}</span>
@@ -185,7 +189,10 @@
                   {@const r = resultValues[test.name]}
                   {#if r}
                     <tr>
-                      <td class="test-name">{test.name}</td>
+                      <td class="test-name">
+                        {test.name}
+                        <button class="info-btn" onclick={() => openGlossary(test.name)} title="View in glossary">i</button>
+                      </td>
                       <td>
                         {#if r.text_only}
                           <input
@@ -345,6 +352,9 @@
     font-weight: 500;
     font-size: 13px;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 
   .unit {

@@ -37,6 +37,88 @@ pub struct SymptomLogEntry {
     pub notes: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WellnessTrendPoint {
+    pub date: String,
+    pub wellness_score: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SymptomTrendPoint {
+    pub date: String,
+    pub present: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SymptomNameEntry {
+    pub id: i64,
+    pub name: String,
+}
+
+#[tauri::command]
+pub fn get_wellness_trends(db: State<Database>, days: i64) -> Result<Vec<WellnessTrendPoint>, String> {
+    let conn = db.conn.lock().unwrap();
+    let mut stmt = conn
+        .prepare(
+            "SELECT log_date, wellness_score FROM daily_summaries
+             WHERE log_date >= date('now', '-' || ?1 || ' days')
+             ORDER BY log_date ASC",
+        )
+        .map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map(params![days], |row| {
+            Ok(WellnessTrendPoint {
+                date: row.get(0)?,
+                wellness_score: row.get(1)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_symptom_trends(
+    db: State<Database>,
+    symptom_id: i64,
+    days: i64,
+) -> Result<Vec<SymptomTrendPoint>, String> {
+    let conn = db.conn.lock().unwrap();
+    let mut stmt = conn
+        .prepare(
+            "SELECT log_date, severity FROM symptom_logs
+             WHERE symptom_id = ?1
+               AND log_date >= date('now', '-' || ?2 || ' days')
+             ORDER BY log_date ASC",
+        )
+        .map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map(params![symptom_id, days], |row| {
+            Ok(SymptomTrendPoint {
+                date: row.get::<_, String>(0)?,
+                present: row.get::<_, i64>(1)? > 0,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_active_symptom_names(db: State<Database>) -> Result<Vec<SymptomNameEntry>, String> {
+    let conn = db.conn.lock().unwrap();
+    let mut stmt = conn
+        .prepare("SELECT id, name FROM symptoms WHERE active = 1 ORDER BY sort_order")
+        .map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map([], |row| {
+            Ok(SymptomNameEntry {
+                id: row.get(0)?,
+                name: row.get(1)?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+    rows.collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())
+}
+
 #[tauri::command]
 pub fn get_symptoms(db: State<Database>) -> Result<Vec<Symptom>, String> {
     let conn = db.conn.lock().unwrap();

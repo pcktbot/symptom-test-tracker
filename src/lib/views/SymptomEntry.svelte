@@ -6,13 +6,21 @@
 
   let symptoms: Symptom[] = $state([]);
   let date = $state(todayString());
-  let wellnessScore = $state(5);
+  let wellnessScore = $state(3);
   let dailyNotes = $state('');
   let saving = $state(false);
   let saved = $state(false);
 
-  // Keyed by symptom id
-  let entries: Record<number, { severity: number; notes: string }> = $state({});
+  // Keyed by symptom id — severity is 1 (present) or 0 (absent)
+  let entries: Record<number, boolean> = $state({});
+
+  const WELLNESS_LABELS: Record<number, string> = {
+    1: 'Terrible',
+    2: 'Poor',
+    3: 'Okay',
+    4: 'Good',
+    5: 'Great',
+  };
 
   onMount(() => loadDay());
 
@@ -20,17 +28,17 @@
     try {
       symptoms = (await getSymptoms()).filter(s => s.active);
       const log = await getSymptomLog(date);
-      wellnessScore = log.wellness_score;
+      // Clamp old 1-10 scores to 1-5 range
+      wellnessScore = Math.max(1, Math.min(5, log.wellness_score));
       dailyNotes = log.notes;
 
-      // Reset entries
-      const newEntries: Record<number, { severity: number; notes: string }> = {};
+      const newEntries: Record<number, boolean> = {};
       for (const s of symptoms) {
-        newEntries[s.id!] = { severity: 0, notes: '' };
+        newEntries[s.id!] = false;
       }
       for (const e of log.entries) {
-        if (newEntries[e.symptom_id]) {
-          newEntries[e.symptom_id] = { severity: e.severity, notes: e.notes };
+        if (newEntries[e.symptom_id] !== undefined && e.severity > 0) {
+          newEntries[e.symptom_id] = true;
         }
       }
       entries = newEntries;
@@ -47,10 +55,10 @@
   async function handleSave() {
     saving = true;
     try {
-      const entryList: SymptomEntryType[] = Object.entries(entries).map(([id, e]) => ({
+      const entryList: SymptomEntryType[] = Object.entries(entries).map(([id, present]) => ({
         symptom_id: parseInt(id),
-        severity: e.severity,
-        notes: e.notes,
+        severity: present ? 1 : 0,
+        notes: '',
       }));
       await saveSymptomLog(date, entryList, wellnessScore, dailyNotes);
       saved = true;
@@ -78,14 +86,11 @@
 
   // Group symptoms by category
   let grouped = $derived(() => {
-    const groups: Record<string, { symptom: Symptom; entry: { severity: number; notes: string } }[]> = {};
+    const groups: Record<string, Symptom[]> = {};
     for (const s of symptoms) {
       const cat = s.category || 'Other';
       if (!groups[cat]) groups[cat] = [];
-      const entry = entries[s.id!];
-      if (entry) {
-        groups[cat].push({ symptom: s, entry });
-      }
+      groups[cat].push(s);
     }
     return groups;
   });
@@ -112,11 +117,18 @@
   </div>
 
   <div class="wellness-section">
-    <label for="wellness">Overall Wellness: {wellnessScore}/10</label>
-    <input id="wellness" type="range" min="1" max="10" bind:value={wellnessScore} />
-    <div class="range-labels">
-      <span>Terrible</span>
-      <span>Great</span>
+    <div class="wellness-label">How are you feeling today?</div>
+    <div class="wellness-buttons">
+      {#each [1, 2, 3, 4, 5] as score}
+        <button
+          class="wellness-btn"
+          class:selected={wellnessScore === score}
+          onclick={() => wellnessScore = score}
+        >
+          <span class="wellness-score">{score}</span>
+          <span class="wellness-text">{WELLNESS_LABELS[score]}</span>
+        </button>
+      {/each}
     </div>
   </div>
 
@@ -124,28 +136,17 @@
     {#each Object.entries(grouped()) as [category, items]}
       <div class="category-group">
         <h3>{category}</h3>
-        {#each items as { symptom, entry }}
-          <div class="symptom-row">
-            <div class="symptom-info">
-              <span class="symptom-name">{symptom.name}</span>
-              <span class="severity-value">{entry.severity > 0 ? entry.severity + '/10' : '--'}</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="10"
-              bind:value={entry.severity}
-              class="severity-slider"
-              class:active={entry.severity > 0}
-            />
-            <input
-              type="text"
-              class="symptom-notes"
-              bind:value={entry.notes}
-              placeholder="Notes..."
-            />
-          </div>
-        {/each}
+        <div class="checklist">
+          {#each items as symptom}
+            <label class="symptom-check">
+              <input
+                type="checkbox"
+                bind:checked={entries[symptom.id!]}
+              />
+              <span class="check-label">{symptom.name}</span>
+            </label>
+          {/each}
+        </div>
       </div>
     {/each}
   </div>
@@ -201,30 +202,57 @@
 
   .wellness-section {
     margin-bottom: 24px;
-    padding: 12px;
+    padding: 16px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
   }
 
-  .wellness-section label {
+  .wellness-label {
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text);
-    margin-bottom: 6px;
+    margin-bottom: 10px;
   }
 
-  .wellness-section input[type="range"] {
-    width: 100%;
-    border: none;
-    padding: 0;
-  }
-
-  .range-labels {
+  .wellness-buttons {
     display: flex;
-    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .wellness-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 4px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .wellness-btn:hover {
+    border-color: var(--color-accent);
+    background: var(--color-surface-raised);
+  }
+
+  .wellness-btn.selected {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .wellness-score {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .wellness-text {
     font-size: 11px;
-    color: var(--color-text-muted);
-    margin-top: 2px;
+    line-height: 1;
   }
 
   .category-group {
@@ -241,46 +269,38 @@
     color: var(--color-text-muted);
   }
 
-  .symptom-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 4px 0;
+  .checklist {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 4px 16px;
   }
 
-  .symptom-info {
-    width: 160px;
+  .symptom-check {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-shrink: 0;
-  }
-
-  .symptom-name {
+    gap: 8px;
+    padding: 5px 4px;
+    cursor: pointer;
+    border-radius: 4px;
     font-size: 13px;
-    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 0;
   }
 
-  .severity-value {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--color-text-muted);
-    width: 35px;
-    text-align: right;
+  .symptom-check:hover {
+    background: var(--color-surface-raised);
   }
 
-  .severity-slider {
-    flex: 1;
-    min-width: 100px;
-    border: none;
-    padding: 0;
-  }
-
-  .symptom-notes {
-    width: 160px;
-    font-size: 12px;
-    padding: 3px 6px;
+  .symptom-check input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-accent);
     flex-shrink: 0;
+  }
+
+  .check-label {
+    font-weight: 500;
   }
 
   .daily-notes {

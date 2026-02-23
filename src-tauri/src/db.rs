@@ -70,6 +70,18 @@ impl Database {
                 notes TEXT NOT NULL DEFAULT ''
             );
 
+            CREATE TABLE IF NOT EXISTS custom_lab_tests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                panel TEXT NOT NULL,
+                unit TEXT NOT NULL DEFAULT '',
+                ref_low REAL,
+                ref_high REAL,
+                text_only INTEGER NOT NULL DEFAULT 0,
+                description TEXT NOT NULL DEFAULT '',
+                clinical TEXT NOT NULL DEFAULT ''
+            );
+
             CREATE INDEX IF NOT EXISTS idx_lab_results_session ON lab_results(session_id);
             CREATE INDEX IF NOT EXISTS idx_lab_results_test ON lab_results(test_name);
             CREATE INDEX IF NOT EXISTS idx_symptom_logs_date ON symptom_logs(log_date);

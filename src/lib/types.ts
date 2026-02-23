@@ -62,9 +62,42 @@ export interface DayLog {
   notes: string;
 }
 
-export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'symptom-editor' | 'export';
+export interface WellnessTrendPoint {
+  date: string;
+  wellness_score: number;
+}
+
+export interface SymptomTrendPoint {
+  date: string;
+  present: boolean;
+}
+
+export interface SymptomNameEntry {
+  id: number;
+  name: string;
+}
+
+export interface AbnormalResult extends LabResult {
+  prev_value: number | null;
+  prev_text_value: string;
+  prev_flag: string;
+}
+
+export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'symptom-editor' | 'export' | 'welcome' | 'lab-manage';
 
 export type Flag = 'N' | 'L' | 'H' | 'LL' | 'HH';
+
+export interface CustomLabTest {
+  id: number | null;
+  name: string;
+  panel: string;
+  unit: string;
+  ref_low: number | null;
+  ref_high: number | null;
+  text_only: boolean;
+  description: string;
+  clinical: string;
+}
 
 export interface PanelDefinition {
   name: string;

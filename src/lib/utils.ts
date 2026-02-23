@@ -1,4 +1,5 @@
-import type { Flag, PanelDefinition } from './types';
+import type { Flag, PanelDefinition, CustomLabTest } from './types';
+import { getCustomLabTests } from './db';
 
 export function todayString(): string {
   return new Date().toISOString().slice(0, 10);
@@ -134,3 +135,38 @@ export const LAB_PANELS: PanelDefinition[] = [
     ],
   },
 ];
+
+export async function getMergedPanels(): Promise<PanelDefinition[]> {
+  const custom = await getCustomLabTests();
+  if (custom.length === 0) return LAB_PANELS;
+
+  // Deep clone built-in panels
+  const panels: PanelDefinition[] = LAB_PANELS.map(p => ({
+    name: p.name,
+    tests: [...p.tests],
+  }));
+
+  const panelMap = new Map<string, PanelDefinition>();
+  for (const p of panels) panelMap.set(p.name, p);
+
+  for (const ct of custom) {
+    let panel = panelMap.get(ct.panel);
+    if (!panel) {
+      panel = { name: ct.panel, tests: [] };
+      panels.push(panel);
+      panelMap.set(ct.panel, panel);
+    }
+    // Only add if not already in the panel (avoid duplicates with built-in)
+    if (!panel.tests.some(t => t.name === ct.name)) {
+      panel.tests.push({
+        name: ct.name,
+        unit: ct.unit,
+        ref_low: ct.ref_low,
+        ref_high: ct.ref_high,
+        text_only: ct.text_only,
+      });
+    }
+  }
+
+  return panels;
+}

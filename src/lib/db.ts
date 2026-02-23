@@ -4,6 +4,11 @@ import type {
   LabResult,
   LabSessionWithResults,
   TrendPoint,
+  AbnormalResult,
+  CustomLabTest,
+  WellnessTrendPoint,
+  SymptomTrendPoint,
+  SymptomNameEntry,
   Symptom,
   SymptomEntry,
   DayLog,
@@ -30,12 +35,42 @@ export async function getLatestAbnormal(): Promise<LabResult[]> {
   return invoke('get_latest_abnormal');
 }
 
+export async function getLatestAbnormalWithPrevious(): Promise<AbnormalResult[]> {
+  return invoke('get_latest_abnormal_with_previous');
+}
+
+// Custom lab tests
+export async function getCustomLabTests(): Promise<CustomLabTest[]> {
+  return invoke('get_custom_lab_tests');
+}
+
+export async function saveCustomLabTest(test: CustomLabTest): Promise<number> {
+  return invoke('save_custom_lab_test', { test });
+}
+
+export async function deleteCustomLabTest(id: number): Promise<void> {
+  return invoke('delete_custom_lab_test', { id });
+}
+
 export async function getTrends(testName: string, days: number): Promise<TrendPoint[]> {
   return invoke('get_trends', { testName, days });
 }
 
 export async function getAllTestNames(): Promise<string[]> {
   return invoke('get_all_test_names');
+}
+
+// Symptom trend commands
+export async function getWellnessTrends(days: number): Promise<WellnessTrendPoint[]> {
+  return invoke('get_wellness_trends', { days });
+}
+
+export async function getSymptomTrends(symptomId: number, days: number): Promise<SymptomTrendPoint[]> {
+  return invoke('get_symptom_trends', { symptomId, days });
+}
+
+export async function getActiveSymptomNames(): Promise<SymptomNameEntry[]> {
+  return invoke('get_active_symptom_names');
 }
 
 // Symptom commands
