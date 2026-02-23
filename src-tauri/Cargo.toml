@@ -1,6 +1,6 @@
 [package]
 name = "symptom-test-tracker"
-version = "0.1.0"
+version = "1.0.0"
 description = "Desktop app for tracking symptoms and lab results"
 authors = ["you"]
 edition = "2021"
