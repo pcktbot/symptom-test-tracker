@@ -88,6 +88,7 @@ impl Database {
             );
 
             INSERT OR IGNORE INTO settings (key, value) VALUES ('mcp_enabled', 'true');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('mcp_write_enabled', 'false');
 
             CREATE INDEX IF NOT EXISTS idx_lab_results_session ON lab_results(session_id);
             CREATE INDEX IF NOT EXISTS idx_lab_results_test ON lab_results(test_name);

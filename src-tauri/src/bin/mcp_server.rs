@@ -20,6 +20,12 @@ fn open_db() -> Result<Connection, McpError> {
         .map_err(|e| McpError::internal_error(format!("Failed to open database: {}", e), None))
 }
 
+fn open_db_rw() -> Result<Connection, McpError> {
+    let path = db_path();
+    Connection::open_with_flags(&path, rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE)
+        .map_err(|e| McpError::internal_error(format!("Failed to open database for writing: {}", e), None))
+}
+
 fn check_enabled(conn: &Connection) -> Result<(), McpError> {
     let enabled: String = conn
         .query_row("SELECT value FROM settings WHERE key = 'mcp_enabled'", [], |r| r.get(0))
@@ -27,6 +33,19 @@ fn check_enabled(conn: &Connection) -> Result<(), McpError> {
     if enabled != "true" {
         return Err(McpError::internal_error(
             "MCP access is currently disabled in the Symptom Tracker app. Open the app → Settings to re-enable.".to_string(),
+            None,
+        ));
+    }
+    Ok(())
+}
+
+fn check_write_enabled(conn: &Connection) -> Result<(), McpError> {
+    let enabled: String = conn
+        .query_row("SELECT value FROM settings WHERE key = 'mcp_write_enabled'", [], |r| r.get(0))
+        .unwrap_or_default();
+    if enabled != "true" {
+        return Err(McpError::internal_error(
+            "MCP write access is currently disabled in the Symptom Tracker app. Open the app → Settings to enable write access.".to_string(),
             None,
         ));
     }
@@ -46,6 +65,38 @@ pub struct TrendsParam {
     pub test_name: String,
     #[schemars(description = "Number of days to look back")]
     pub days: i64,
+}
+
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
+pub struct InsertLabSessionParam {
+    #[schemars(description = "Date of the lab test in YYYY-MM-DD format")]
+    pub test_date: String,
+    #[schemars(description = "Name of the lab/facility (optional)")]
+    pub lab_name: Option<String>,
+    #[schemars(description = "Free-text notes about this lab session (optional)")]
+    pub notes: Option<String>,
+    #[schemars(description = "Array of individual lab result entries")]
+    pub results: Vec<LabResultInput>,
+}
+
+#[derive(Debug, Deserialize, schemars::JsonSchema)]
+pub struct LabResultInput {
+    #[schemars(description = "Name of the lab test (e.g. 'TSH', 'WBC', 'Hemoglobin')")]
+    pub test_name: String,
+    #[schemars(description = "Panel/category the test belongs to (e.g. 'Thyroid', 'CBC')")]
+    pub panel: Option<String>,
+    #[schemars(description = "Numeric value of the result, if applicable")]
+    pub value: Option<f64>,
+    #[schemars(description = "Text value for non-numeric results (e.g. 'Positive', 'Reactive')")]
+    pub text_value: Option<String>,
+    #[schemars(description = "Unit of measurement (e.g. 'mIU/L', 'mg/dL')")]
+    pub unit: Option<String>,
+    #[schemars(description = "Lower bound of the reference range")]
+    pub ref_range_low: Option<f64>,
+    #[schemars(description = "Upper bound of the reference range")]
+    pub ref_range_high: Option<f64>,
+    #[schemars(description = "Flag: 'N' for normal, 'H' for high, 'L' for low, 'A' for abnormal")]
+    pub flag: Option<String>,
 }
 
 // Response structs
@@ -327,6 +378,67 @@ impl TrackerMcp {
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
+
+    #[tool(description = "Insert a new lab session with results. Use this to save lab results parsed from a lab report. \
+        Each result needs at minimum a test_name and either a numeric value or text_value. \
+        Set the flag to 'H' (high), 'L' (low), or 'A' (abnormal) if the result is outside the reference range, \
+        or 'N' for normal. Results where both value and text_value are empty will be skipped. \
+        Requires MCP write access to be enabled in the app settings.")]
+    fn insert_lab_session(
+        &self,
+        Parameters(params): Parameters<InsertLabSessionParam>,
+    ) -> Result<CallToolResult, McpError> {
+        // Use read-only connection first to check settings
+        let ro_conn = open_db()?;
+        check_enabled(&ro_conn)?;
+        check_write_enabled(&ro_conn)?;
+        drop(ro_conn);
+
+        let conn = open_db_rw()?;
+        conn.execute_batch("PRAGMA foreign_keys=ON;")
+            .map_err(|e| McpError::internal_error(e.to_string(), None))?;
+
+        conn.execute(
+            "INSERT INTO lab_sessions (test_date, lab_name, notes) VALUES (?1, ?2, ?3)",
+            rusqlite::params![
+                params.test_date,
+                params.lab_name.unwrap_or_default(),
+                params.notes.unwrap_or_default(),
+            ],
+        ).map_err(|e| McpError::internal_error(format!("Failed to insert lab session: {}", e), None))?;
+
+        let session_id = conn.last_insert_rowid();
+        let mut inserted = 0u32;
+
+        for r in &params.results {
+            let text_val = r.text_value.clone().unwrap_or_default();
+            if r.value.is_none() && text_val.is_empty() {
+                continue;
+            }
+            conn.execute(
+                "INSERT INTO lab_results (session_id, test_name, panel, value, text_value, unit, ref_range_low, ref_range_high, flag)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+                rusqlite::params![
+                    session_id,
+                    r.test_name,
+                    r.panel.clone().unwrap_or_default(),
+                    r.value,
+                    text_val,
+                    r.unit.clone().unwrap_or_default(),
+                    r.ref_range_low,
+                    r.ref_range_high,
+                    r.flag.clone().unwrap_or_else(|| "N".to_string()),
+                ],
+            ).map_err(|e| McpError::internal_error(format!("Failed to insert lab result: {}", e), None))?;
+            inserted += 1;
+        }
+
+        let response = serde_json::json!({
+            "session_id": session_id,
+            "results_inserted": inserted,
+        });
+        Ok(CallToolResult::success(vec![Content::text(response.to_string())]))
+    }
 }
 
 #[tool_handler]
@@ -339,9 +451,11 @@ impl ServerHandler for TrackerMcp {
                 .build(),
             server_info: Implementation::from_build_env(),
             instructions: Some(
-                "MCP server for querying symptom and lab test tracking data. \
-                 Provides tools to retrieve recent labs, abnormal values, symptom history, \
-                 trends for specific tests, and daily wellness summaries.".into(),
+                "MCP server for symptom and lab test tracking data. \
+                 Read tools: retrieve recent labs, abnormal values, symptom history, \
+                 trends for specific tests, and daily wellness summaries. \
+                 Write tools: insert a new lab session with results (e.g. parsed from a pasted lab report). \
+                 Write access must be enabled separately by the user in the app settings.".into(),
             ),
         }
     }

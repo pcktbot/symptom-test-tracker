@@ -5,12 +5,17 @@
   let { onClose }: { onClose: () => void } = $props();
 
   let mcpEnabled = $state(true);
+  let mcpWriteEnabled = $state(false);
   let loading = $state(true);
   let setupExpanded = $state(true);
 
   onMount(async () => {
-    const val = await getSetting('mcp_enabled');
-    mcpEnabled = val === 'true';
+    const [readVal, writeVal] = await Promise.all([
+      getSetting('mcp_enabled'),
+      getSetting('mcp_write_enabled'),
+    ]);
+    mcpEnabled = readVal === 'true';
+    mcpWriteEnabled = writeVal === 'true';
     loading = false;
 
     function handleKeydown(e: KeyboardEvent) {
@@ -23,6 +28,15 @@
   async function toggleMcp() {
     mcpEnabled = !mcpEnabled;
     await setSetting('mcp_enabled', mcpEnabled ? 'true' : 'false');
+    if (!mcpEnabled && mcpWriteEnabled) {
+      mcpWriteEnabled = false;
+      await setSetting('mcp_write_enabled', 'false');
+    }
+  }
+
+  async function toggleMcpWrite() {
+    mcpWriteEnabled = !mcpWriteEnabled;
+    await setSetting('mcp_write_enabled', mcpWriteEnabled ? 'true' : 'false');
   }
 </script>
 
@@ -49,7 +63,25 @@
         </button>
         <div class="toggle-label">
           <span class="toggle-title">Allow MCP clients to read your data</span>
-          <span class="toggle-subtitle">When enabled, AI assistants with the MCP server configured can query your lab results and symptom logs (read-only).</span>
+          <span class="toggle-subtitle">When enabled, AI assistants with the MCP server configured can query your lab results and symptom logs.</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top: 12px;">
+        <button
+          class="toggle"
+          class:on={mcpWriteEnabled}
+          onclick={toggleMcpWrite}
+          disabled={loading || !mcpEnabled}
+          role="switch"
+          aria-checked={mcpWriteEnabled}
+          aria-label="Toggle MCP write access"
+        >
+          <span class="toggle-knob"></span>
+        </button>
+        <div class="toggle-label">
+          <span class="toggle-title">Allow MCP clients to write data</span>
+          <span class="toggle-subtitle">When enabled, AI assistants can insert new lab sessions and results (e.g. from a pasted lab report).</span>
         </div>
       </div>
     </section>
@@ -62,7 +94,7 @@
 
       {#if setupExpanded}
         <div class="setup-content">
-          <p class="setup-desc">The MCP server gives AI assistants read-only access to your tracking data via the Model Context Protocol.</p>
+          <p class="setup-desc">The MCP server gives AI assistants access to your tracking data via the Model Context Protocol. Read access lets them query data; write access lets them insert new lab results.</p>
 
           <h4>Available tools</h4>
           <ul class="tools-list">
@@ -71,6 +103,7 @@
             <li>Symptom history with severity</li>
             <li>Test trends over time</li>
             <li>Daily wellness summaries</li>
+            <li>Insert lab session with results (requires write access)</li>
           </ul>
 
           <h4>Binary path</h4>
