@@ -12,6 +12,10 @@ import type {
   Symptom,
   SymptomEntry,
   DayLog,
+  Artifact,
+  Diagnosis,
+  ExtractionResult,
+  ChatMessage,
 } from './types';
 
 // Lab commands
@@ -121,4 +125,63 @@ export async function exportData(
   format: string,
 ): Promise<string> {
   return invoke('export_data', { startDate, endDate, includeLabs, includeSymptoms, format });
+}
+
+// Diagnoses
+export async function getDiagnoses(): Promise<Diagnosis[]> {
+  return invoke('get_diagnoses');
+}
+
+export async function saveDiagnosis(diagnosis: Diagnosis): Promise<number> {
+  return invoke('save_diagnosis', { diagnosis });
+}
+
+export async function deleteDiagnosis(id: number): Promise<void> {
+  return invoke('delete_diagnosis', { id });
+}
+
+// Artifacts
+export async function getArtifacts(): Promise<Artifact[]> {
+  return invoke('get_artifacts');
+}
+
+export async function getArtifact(id: number): Promise<Artifact> {
+  return invoke('get_artifact', { id });
+}
+
+export async function saveArtifactPaste(title: string, content: string): Promise<number> {
+  return invoke('save_artifact_paste', { title, content });
+}
+
+export async function saveArtifactFile(title: string, sourcePath: string): Promise<number> {
+  return invoke('save_artifact_file', { title, sourcePath });
+}
+
+export async function deleteArtifact(id: number): Promise<void> {
+  return invoke('delete_artifact', { id });
+}
+
+export async function extractLabsFromArtifact(artifactId: number): Promise<ExtractionResult> {
+  return invoke('extract_labs_from_artifact', { artifactId });
+}
+
+// Chat
+export async function sendChatMessage(content: string): Promise<void> {
+  return invoke('send_chat_message', { content });
+}
+
+export async function getChatHistory(): Promise<ChatMessage[]> {
+  return invoke('get_chat_history');
+}
+
+export async function clearChatHistory(): Promise<void> {
+  return invoke('clear_chat_history');
+}
+
+export async function getMemory(): Promise<string> {
+  return invoke('get_memory');
+}
+
+export async function saveMemory(content: string): Promise<void> {
+  return invoke('save_memory', { content });
 }
