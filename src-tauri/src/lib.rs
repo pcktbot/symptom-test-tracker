@@ -45,6 +45,11 @@ pub fn run() {
             commands::artifacts::save_artifact_file,
             commands::artifacts::delete_artifact,
             commands::artifacts::extract_labs_from_artifact,
+            commands::chat::get_chat_history,
+            commands::chat::clear_chat_history,
+            commands::chat::get_memory,
+            commands::chat::save_memory,
+            commands::chat::send_chat_message,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
