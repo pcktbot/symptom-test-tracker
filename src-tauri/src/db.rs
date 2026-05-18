@@ -168,14 +168,14 @@ pub fn db_path() -> PathBuf {
     base.join("symptom-test-tracker").join("tracker.db")
 }
 
-pub fn artifacts_dir() -> std::path::PathBuf {
+pub fn artifacts_dir() -> PathBuf {
     let base = dirs::data_local_dir().expect("Could not determine local data directory");
     let dir = base.join("symptom-test-tracker").join("artifacts");
-    std::fs::create_dir_all(&dir).ok();
+    std::fs::create_dir_all(&dir).expect("Failed to create artifacts directory");
     dir
 }
 
-pub fn memory_path() -> std::path::PathBuf {
+pub fn memory_path() -> PathBuf {
     let base = dirs::data_local_dir().expect("Could not determine local data directory");
     base.join("symptom-test-tracker").join("memory.md")
 }
