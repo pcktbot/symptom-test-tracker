@@ -14,6 +14,8 @@
   import Settings from '$lib/views/Settings.svelte';
   import Diagnoses from '$lib/views/Diagnoses.svelte';
   import Artifacts from '$lib/views/Artifacts.svelte';
+  import Chat from '$lib/views/Chat.svelte';
+  import { getSetting } from '$lib/db';
 
   const welcomeSeen = typeof localStorage !== 'undefined' && localStorage.getItem('welcome_seen') === 'true';
   let currentView: View = $state(welcomeSeen ? 'dashboard' : 'welcome');
@@ -21,6 +23,8 @@
   let settingsOpen = $state(false);
   let glossaryOpen = $state(false);
   let glossaryTest: string | null = $state(null);
+  let chatOpen = $state(false);
+  let chatEnabled = $state(false);
 
   // Track body area width to decide inline vs overlay
   // We measure body-area (not content) to avoid resize loops when glossary toggles
@@ -65,6 +69,10 @@
     return () => ro.disconnect();
   });
 
+  $effect(() => {
+    getSetting('chat_enabled').then(v => chatEnabled = v === 'true');
+  });
+
   type NavGroup = { label: string; items: { view: View; label: string }[] };
 
   const navGroups: NavGroup[] = [
@@ -106,6 +114,16 @@
         <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.902 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.421 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.421-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.421-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.116l.094-.318z"/>
       </svg>
     </button>
+    {#if chatEnabled}
+      <button
+        class="chat-toggle-btn"
+        class:active={chatOpen}
+        onclick={() => chatOpen = !chatOpen}
+        title="AI Assistant"
+      >
+        ✦ Chat
+      </button>
+    {/if}
   </div>
     <nav class="toolbar-nav">
       {#each navGroups as group}
@@ -157,6 +175,12 @@
     {#if glossaryOpen && glossaryInline}
       <div class="glossary-inline" style="width: {GLOSSARY_WIDTH}px">
         <Glossary activeTest={glossaryTest} onClose={closeGlossary} />
+      </div>
+    {/if}
+
+    {#if chatOpen}
+      <div class="chat-inline" style="width: 320px">
+        <Chat onClose={() => chatOpen = false} />
       </div>
     {/if}
   </div>
@@ -360,5 +384,34 @@
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     overflow-y: auto;
+  }
+
+  .chat-inline {
+    flex-shrink: 0;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .chat-toggle-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .chat-toggle-btn:hover {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+  }
+  .chat-toggle-btn.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
   }
 </style>
