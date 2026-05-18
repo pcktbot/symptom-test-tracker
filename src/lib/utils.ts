@@ -171,3 +171,20 @@ export async function getMergedPanels(): Promise<PanelDefinition[]> {
 
   return panels;
 }
+
+export function extractMemoryTag(text: string): { memory: string | null; displayText: string } {
+  const match = text.match(/<memory>([\s\S]*?)<\/memory>/);
+  if (!match) return { memory: null, displayText: text };
+  const memory = match[1].trim();
+  let displayText = text.replace(match[0], '').trim();
+  // Collapse multiple consecutive newlines to single newlines
+  displayText = displayText.replace(/\n\n+/g, '\n');
+  return { memory, displayText };
+}
+
+export function inferContentType(filename: string): 'text' | 'html' | 'pdf' {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+  if (ext === 'pdf') return 'pdf';
+  if (ext === 'html' || ext === 'htm') return 'html';
+  return 'text';
+}

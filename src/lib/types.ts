@@ -83,7 +83,7 @@ export interface AbnormalResult extends LabResult {
   prev_flag: string;
 }
 
-export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'symptom-editor' | 'export' | 'welcome' | 'lab-manage';
+export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'symptom-editor' | 'export' | 'welcome' | 'lab-manage' | 'artifacts' | 'diagnoses';
 
 export type Flag = 'N' | 'L' | 'H' | 'LL' | 'HH';
 
@@ -110,4 +110,48 @@ export interface TestDefinition {
   ref_low: number | null;
   ref_high: number | null;
   text_only?: boolean;
+}
+
+export interface Artifact {
+  id: number | null;
+  title: string;
+  source_type: 'paste' | 'file';
+  content_type: 'text' | 'html' | 'pdf';
+  text_content: string;
+  file_path: string;
+  created_at: string;
+}
+
+export interface Diagnosis {
+  id: number | null;
+  name: string;
+  short_name: string;
+  onset_date: string | null;
+  resolution_date: string | null;
+  chronic: boolean;
+  source: string;
+  details: string;
+  created_at: string;
+}
+
+export interface ExtractedLabResult {
+  test_name: string;
+  panel: string;
+  value: number | null;
+  text_value: string;
+  unit: string;
+  ref_range_low: number | null;
+  ref_range_high: number | null;
+  flag: string;
+}
+
+export interface ExtractionResult {
+  date: string | null;
+  results: ExtractedLabResult[];
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
 }
