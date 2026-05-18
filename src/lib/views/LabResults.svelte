@@ -3,6 +3,7 @@
   import { getLabSessions, getLabSession, deleteLabSession } from '$lib/db';
   import { formatDate, flagClass } from '$lib/utils';
   import type { LabSession, LabResult, View } from '$lib/types';
+  import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
 
   let { onNavigate, openGlossary }: { onNavigate: (view: View, sessionId?: number | null) => void; openGlossary: (testName?: string) => void } = $props();
 
@@ -68,6 +69,7 @@
 </script>
 
 <div class="lab-results">
+  <DiagnosisAccordion {onNavigate} />
   <div class="header">
     <h1>Lab Results</h1>
     <button class="primary" onclick={() => onNavigate('lab-entry')}>+ New Lab Entry</button>

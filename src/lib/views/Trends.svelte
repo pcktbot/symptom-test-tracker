@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { getAllTestNames, getTrends, getWellnessTrends, getSymptomTrends, getActiveSymptomNames } from '$lib/db';
-  import type { TrendPoint, WellnessTrendPoint, SymptomTrendPoint, SymptomNameEntry } from '$lib/types';
+  import type { TrendPoint, WellnessTrendPoint, SymptomTrendPoint, SymptomNameEntry, View } from '$lib/types';
   import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Legend, Tooltip, Filler } from 'chart.js';
+  import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
 
   Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Legend, Tooltip, Filler);
 
-  let { openGlossary }: { openGlossary: (testName?: string) => void } = $props();
+  let { openGlossary, onNavigate }: { openGlossary: (testName?: string) => void; onNavigate: (view: View) => void } = $props();
 
   let mode: 'labs' | 'symptoms' = $state('labs');
 
@@ -228,6 +229,7 @@
 </script>
 
 <div class="trends">
+  <DiagnosisAccordion {onNavigate} />
   <h1>Trends</h1>
 
   <div class="mode-toggle">

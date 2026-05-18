@@ -12,6 +12,8 @@
   import LabManage from '$lib/views/LabManage.svelte';
   import Welcome from '$lib/views/Welcome.svelte';
   import Settings from '$lib/views/Settings.svelte';
+  import Diagnoses from '$lib/views/Diagnoses.svelte';
+  // TODO: import Artifacts from '$lib/views/Artifacts.svelte'; // Task 11
 
   const welcomeSeen = typeof localStorage !== 'undefined' && localStorage.getItem('welcome_seen') === 'true';
   let currentView: View = $state(welcomeSeen ? 'dashboard' : 'welcome');
@@ -66,12 +68,7 @@
   type NavGroup = { label: string; items: { view: View; label: string }[] };
 
   const navGroups: NavGroup[] = [
-    {
-      label: 'Overview',
-      items: [
-        { view: 'dashboard', label: 'Dashboard' },
-      ],
-    },
+    { label: 'Overview', items: [{ view: 'dashboard', label: 'Dashboard' }] },
     {
       label: 'Labs',
       items: [
@@ -91,8 +88,10 @@
       label: 'Data',
       items: [
         { view: 'export', label: 'Export' },
+        { view: 'artifacts', label: 'Artifacts' },
       ],
     },
+    { label: 'Profile', items: [{ view: 'diagnoses', label: 'Diagnoses' }] },
   ];
 </script>
 
@@ -139,15 +138,19 @@
       {:else if currentView === 'lab-entry'}
         <LabEntry sessionId={editSessionId} onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'trends'}
-        <Trends {openGlossary} />
+        <Trends {openGlossary} onNavigate={navigate} />
       {:else if currentView === 'symptoms'}
-        <SymptomEntry />
+        <SymptomEntry onNavigate={navigate} />
       {:else if currentView === 'symptom-editor'}
         <SymptomEditor />
       {:else if currentView === 'lab-manage'}
         <LabManage />
       {:else if currentView === 'export'}
         <Export />
+      {:else if currentView === 'artifacts'}
+        <!-- TODO: <Artifacts onNavigate={navigate} /> Task 11 -->
+      {:else if currentView === 'diagnoses'}
+        <Diagnoses />
       {/if}
     </main>
 

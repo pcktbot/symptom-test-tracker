@@ -2,7 +2,10 @@
   import { onMount } from 'svelte';
   import { getSymptoms, getSymptomLog, saveSymptomLog } from '$lib/db';
   import { todayString, formatDate } from '$lib/utils';
-  import type { Symptom, SymptomEntry as SymptomEntryType } from '$lib/types';
+  import type { Symptom, SymptomEntry as SymptomEntryType, View } from '$lib/types';
+  import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
+
+  let { onNavigate }: { onNavigate: (view: View) => void } = $props();
 
   let symptoms: Symptom[] = $state([]);
   let date = $state(todayString());
@@ -97,6 +100,7 @@
 </script>
 
 <div class="symptom-entry">
+  <DiagnosisAccordion {onNavigate} />
   <div class="header">
     <h1>Symptom Log</h1>
     <div class="header-actions">
