@@ -5,6 +5,7 @@
   let diagnoses = $state<Diagnosis[]>([]);
   let editing = $state<Diagnosis | null>(null);
   let saving = $state(false);
+  let saveError = $state('');
 
   function blank(): Diagnosis {
     return {
@@ -24,10 +25,13 @@
   async function handleSave() {
     if (!editing || !editing.name.trim()) return;
     saving = true;
+    saveError = '';
     try {
       await saveDiagnosis(editing);
       diagnoses = await getDiagnoses();
       editing = null;
+    } catch (e: any) {
+      saveError = e?.toString() ?? 'Failed to save';
     } finally {
       saving = false;
     }
@@ -59,7 +63,7 @@
         </div>
         <div class="field">
           <label>Onset date</label>
-          <input type="date" bind:value={editing.onset_date} />
+          <input type="date" value={editing.onset_date ?? ''} oninput={(e) => { if (editing) editing.onset_date = (e.currentTarget as HTMLInputElement).value || null; }} />
         </div>
         <div class="field field-inline">
           <label>
@@ -70,7 +74,7 @@
         {#if !editing.chronic}
           <div class="field">
             <label>Resolution date</label>
-            <input type="date" bind:value={editing.resolution_date} />
+            <input type="date" value={editing.resolution_date ?? ''} oninput={(e) => { if (editing) editing.resolution_date = (e.currentTarget as HTMLInputElement).value || null; }} />
           </div>
         {/if}
         <div class="field full">
@@ -88,6 +92,9 @@
           {saving ? 'Saving…' : 'Save'}
         </button>
       </div>
+      {#if saveError}
+        <p class="save-error">{saveError}</p>
+      {/if}
     </div>
   {/if}
 
@@ -151,4 +158,5 @@
   .diagnosis-actions { display: flex; gap: 6px; flex-shrink: 0; }
   .btn-sm { padding: 3px 10px; font-size: 12px; }
   .btn-danger { color: var(--color-error, #e05555); }
+  .save-error { color: var(--color-error, #e05555); font-size: 12px; margin-top: 8px; }
 </style>
