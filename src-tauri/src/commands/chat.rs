@@ -326,7 +326,7 @@ fn save_assistant_message(app: &tauri::AppHandle, content: &str) {
 
 fn regex_strip_memory(text: &str) -> String {
     // Simple tag strip without regex crate — find first <memory> and last </memory>
-    if let (Some(start), Some(end)) = (text.find("<memory>"), text.find("</memory>")) {
+    if let (Some(start), Some(end)) = (text.find("<memory>"), text.rfind("</memory>")) {
         if start < end {
             let before = text[..start].trim_end();
             let after = text[end + 9..].trim_start(); // 9 = len("</memory>")
