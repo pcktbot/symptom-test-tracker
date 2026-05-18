@@ -74,7 +74,8 @@
         unit: r.unit, ref_range_low: r.ref_range_low,
         ref_range_high: r.ref_range_high, flag: r.flag,
       }));
-      await saveLabSession(session, results as any);
+      // LabResult fields match the mapped shape; id/session_id are nullable as expected
+      await saveLabSession(session, results as LabResult[]);
       extraction = null; extractionArtifactId = null;
     } finally { importing = false; }
   }
