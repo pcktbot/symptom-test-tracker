@@ -13,7 +13,7 @@
   import Welcome from '$lib/views/Welcome.svelte';
   import Settings from '$lib/views/Settings.svelte';
   import Diagnoses from '$lib/views/Diagnoses.svelte';
-  // TODO: import Artifacts from '$lib/views/Artifacts.svelte'; // Task 11
+  import Artifacts from '$lib/views/Artifacts.svelte';
 
   const welcomeSeen = typeof localStorage !== 'undefined' && localStorage.getItem('welcome_seen') === 'true';
   let currentView: View = $state(welcomeSeen ? 'dashboard' : 'welcome');
@@ -148,7 +148,7 @@
       {:else if currentView === 'export'}
         <Export />
       {:else if currentView === 'artifacts'}
-        <!-- TODO: <Artifacts onNavigate={navigate} /> Task 11 -->
+        <Artifacts onNavigate={navigate} />
       {:else if currentView === 'diagnoses'}
         <Diagnoses />
       {/if}
