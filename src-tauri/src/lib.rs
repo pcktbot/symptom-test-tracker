@@ -39,6 +39,12 @@ pub fn run() {
             commands::export::export_data,
             commands::settings::get_setting,
             commands::settings::set_setting,
+            commands::artifacts::get_artifacts,
+            commands::artifacts::get_artifact,
+            commands::artifacts::save_artifact_paste,
+            commands::artifacts::save_artifact_file,
+            commands::artifacts::delete_artifact,
+            commands::artifacts::extract_labs_from_artifact,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
