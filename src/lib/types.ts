@@ -84,7 +84,7 @@ export interface AbnormalResult extends LabResult {
   prev_flag: string;
 }
 
-export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'symptom-editor' | 'export' | 'welcome' | 'lab-manage' | 'artifacts' | 'diagnoses';
+export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'welcome' | 'artifacts' | 'diagnoses';
 
 export type Flag = 'N' | 'L' | 'H' | 'LL' | 'HH';
 

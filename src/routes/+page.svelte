@@ -6,10 +6,7 @@
   import LabEntry from '$lib/views/LabEntry.svelte';
   import Trends from '$lib/views/Trends.svelte';
   import SymptomEntry from '$lib/views/SymptomEntry.svelte';
-  import SymptomEditor from '$lib/views/SymptomEditor.svelte';
-  import Export from '$lib/views/Export.svelte';
   import Glossary from '$lib/views/Glossary.svelte';
-  import LabManage from '$lib/views/LabManage.svelte';
   import Welcome from '$lib/views/Welcome.svelte';
   import Settings from '$lib/views/Settings.svelte';
   import Diagnoses from '$lib/views/Diagnoses.svelte';
@@ -82,20 +79,17 @@
       items: [
         { view: 'lab-results', label: 'Results' },
         { view: 'trends', label: 'Trends' },
-        { view: 'lab-manage', label: 'Manage' },
       ],
     },
     {
       label: 'Symptoms',
       items: [
         { view: 'symptoms', label: 'Log' },
-        { view: 'symptom-editor', label: 'Manage' },
       ],
     },
     {
       label: 'Data',
       items: [
-        { view: 'export', label: 'Export' },
         { view: 'artifacts', label: 'Artifacts' },
       ],
     },
@@ -159,12 +153,6 @@
         <Trends {openGlossary} onNavigate={navigate} />
       {:else if currentView === 'symptoms'}
         <SymptomEntry onNavigate={navigate} />
-      {:else if currentView === 'symptom-editor'}
-        <SymptomEditor />
-      {:else if currentView === 'lab-manage'}
-        <LabManage />
-      {:else if currentView === 'export'}
-        <Export />
       {:else if currentView === 'artifacts'}
         <Artifacts onNavigate={navigate} />
       {:else if currentView === 'diagnoses'}
