@@ -78,6 +78,7 @@ export interface SymptomNameEntry {
 }
 
 export interface AbnormalResult extends LabResult {
+  test_date: string;
   prev_value: number | null;
   prev_text_value: string;
   prev_flag: string;

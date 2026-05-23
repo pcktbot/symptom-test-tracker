@@ -228,6 +228,22 @@ pub fn delete_lab_session(db: State<Database>, id: i64) -> Result<(), String> {
     Ok(())
 }
 
+/// Merge all results from `source_id` into `target_id`, then delete the source session.
+#[tauri::command]
+pub fn merge_lab_sessions(db: State<Database>, target_id: i64, source_id: i64) -> Result<(), String> {
+    if target_id == source_id {
+        return Err("Cannot merge a session into itself".into());
+    }
+    let conn = db.conn.lock().unwrap();
+    conn.execute(
+        "UPDATE lab_results SET session_id = ?1 WHERE session_id = ?2",
+        params![target_id, source_id],
+    ).map_err(|e| e.to_string())?;
+    conn.execute("DELETE FROM lab_sessions WHERE id = ?1", params![source_id])
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AbnormalResult {
     pub id: Option<i64>,
@@ -240,6 +256,7 @@ pub struct AbnormalResult {
     pub ref_range_low: Option<f64>,
     pub ref_range_high: Option<f64>,
     pub flag: String,
+    pub test_date: String,
     pub prev_value: Option<f64>,
     pub prev_text_value: String,
     pub prev_flag: String,
@@ -252,13 +269,13 @@ pub fn get_latest_abnormal_with_previous(db: State<Database>) -> Result<Vec<Abno
         .prepare(
             "WITH ranked AS (
                 SELECT r.id, r.session_id, r.test_name, r.panel, r.value, r.text_value, r.unit,
-                       r.ref_range_low, r.ref_range_high, r.flag,
+                       r.ref_range_low, r.ref_range_high, r.flag, s.test_date,
                        ROW_NUMBER() OVER (PARTITION BY r.test_name ORDER BY s.test_date DESC) as rn
                 FROM lab_results r
                 JOIN lab_sessions s ON r.session_id = s.id
              )
              SELECT cur.id, cur.session_id, cur.test_name, cur.panel, cur.value, cur.text_value,
-                    cur.unit, cur.ref_range_low, cur.ref_range_high, cur.flag,
+                    cur.unit, cur.ref_range_low, cur.ref_range_high, cur.flag, cur.test_date,
                     prev.value, COALESCE(prev.text_value, ''), COALESCE(prev.flag, '')
              FROM ranked cur
              LEFT JOIN ranked prev ON cur.test_name = prev.test_name AND prev.rn = 2
@@ -279,9 +296,10 @@ pub fn get_latest_abnormal_with_previous(db: State<Database>) -> Result<Vec<Abno
                 ref_range_low: row.get(7)?,
                 ref_range_high: row.get(8)?,
                 flag: row.get(9)?,
-                prev_value: row.get(10)?,
-                prev_text_value: row.get(11)?,
-                prev_flag: row.get(12)?,
+                test_date: row.get(10)?,
+                prev_value: row.get(11)?,
+                prev_text_value: row.get(12)?,
+                prev_flag: row.get(13)?,
             })
         })
         .map_err(|e| e.to_string())?;
