@@ -3,6 +3,7 @@
   import { getLatestAbnormalWithPrevious } from '$lib/db';
   import { flagClass } from '$lib/utils';
   import type { AbnormalResult, View } from '$lib/types';
+  import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
 
   let { onNavigate, openGlossary }: { onNavigate: (view: View, sessionId?: number | null) => void; openGlossary: (testName?: string) => void } = $props();
 
@@ -66,6 +67,7 @@
 </script>
 
 <div class="dashboard">
+  <DiagnosisAccordion {onNavigate} />
   <div class="header">
     <h1>Dashboard</h1>
     <div class="header-actions">

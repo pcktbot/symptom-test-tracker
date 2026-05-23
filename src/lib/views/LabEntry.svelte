@@ -3,6 +3,7 @@
   import { getLabSession, saveLabSession } from '$lib/db';
   import { todayString, getMergedPanels } from '$lib/utils';
   import type { LabSession, LabResult, PanelDefinition, View } from '$lib/types';
+  import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
 
   let { sessionId = null, onNavigate, openGlossary }: { sessionId: number | null; onNavigate: (view: View) => void; openGlossary: (testName?: string) => void } = $props();
 
@@ -132,6 +133,7 @@
 </script>
 
 <div class="lab-entry">
+  <DiagnosisAccordion {onNavigate} />
   <div class="header">
     <h1>{sessionId ? 'Edit' : 'New'} Lab Entry</h1>
     <div class="header-actions">

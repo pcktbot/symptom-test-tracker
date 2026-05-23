@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { todayString, formatDate, flagLabel, flagClass, LAB_PANELS, getMergedPanels } from './utils';
+import { todayString, formatDate, flagLabel, flagClass, LAB_PANELS, getMergedPanels, extractMemoryTag, inferContentType } from './utils';
 import { getCustomLabTests } from './db';
 
 vi.mock('./db', () => ({
@@ -214,5 +214,42 @@ describe('getMergedPanels', () => {
     const cbc = panels.find(p => p.name === 'CBC');
     const wbcCount = cbc?.tests.filter(t => t.name === 'WBC').length;
     expect(wbcCount).toBe(1);
+  });
+});
+
+describe('extractMemoryTag', () => {
+  it('returns null memory and original text when no tag present', () => {
+    const result = extractMemoryTag('Hello world');
+    expect(result.memory).toBeNull();
+    expect(result.displayText).toBe('Hello world');
+  });
+
+  it('extracts memory content and strips tag from display text', () => {
+    const result = extractMemoryTag('Some answer.\n<memory>User has lupus</memory>\nMore text.');
+    expect(result.memory).toBe('User has lupus');
+    expect(result.displayText).toBe('Some answer.\nMore text.');
+  });
+
+  it('trims whitespace from display text after stripping tag', () => {
+    const result = extractMemoryTag('<memory>note</memory>');
+    expect(result.displayText).toBe('');
+  });
+});
+
+describe('inferContentType', () => {
+  it('returns pdf for .pdf files', () => {
+    expect(inferContentType('report.pdf')).toBe('pdf');
+    expect(inferContentType('REPORT.PDF')).toBe('pdf');
+  });
+
+  it('returns html for .html and .htm files', () => {
+    expect(inferContentType('visit.html')).toBe('html');
+    expect(inferContentType('visit.htm')).toBe('html');
+  });
+
+  it('returns text for all other extensions', () => {
+    expect(inferContentType('notes.txt')).toBe('text');
+    expect(inferContentType('data.csv')).toBe('text');
+    expect(inferContentType('noextension')).toBe('text');
   });
 });

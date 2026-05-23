@@ -5,12 +5,24 @@
   let { onClose }: { onClose: () => void } = $props();
 
   let mcpEnabled = $state(true);
+  let mcpWriteEnabled = $state(false);
   let loading = $state(true);
   let setupExpanded = $state(true);
+  let apiKeyValue = $state('');
+  let chatEnabledValue = $state(true);
+  let apiKeySaved = $state(false);
 
   onMount(async () => {
-    const val = await getSetting('mcp_enabled');
-    mcpEnabled = val === 'true';
+    const [readVal, writeVal, apiKeyResult, chatEnabledResult] = await Promise.all([
+      getSetting('mcp_enabled'),
+      getSetting('mcp_write_enabled'),
+      getSetting('anthropic_api_key'),
+      getSetting('chat_enabled'),
+    ]);
+    mcpEnabled = readVal === 'true';
+    mcpWriteEnabled = writeVal === 'true';
+    apiKeyValue = apiKeyResult;
+    chatEnabledValue = chatEnabledResult === 'true';
     loading = false;
 
     function handleKeydown(e: KeyboardEvent) {
@@ -23,6 +35,15 @@
   async function toggleMcp() {
     mcpEnabled = !mcpEnabled;
     await setSetting('mcp_enabled', mcpEnabled ? 'true' : 'false');
+    if (!mcpEnabled && mcpWriteEnabled) {
+      mcpWriteEnabled = false;
+      await setSetting('mcp_write_enabled', 'false');
+    }
+  }
+
+  async function toggleMcpWrite() {
+    mcpWriteEnabled = !mcpWriteEnabled;
+    await setSetting('mcp_write_enabled', mcpWriteEnabled ? 'true' : 'false');
   }
 </script>
 
@@ -33,6 +54,52 @@
   </div>
 
   <div class="settings-body">
+    <section class="section">
+      <h3>AI Assistant</h3>
+      <div class="toggle-row">
+        <button
+          class="toggle"
+          class:on={chatEnabledValue}
+          onclick={async () => { chatEnabledValue = !chatEnabledValue; await setSetting('chat_enabled', chatEnabledValue ? 'true' : 'false'); }}
+          role="switch"
+          aria-checked={chatEnabledValue}
+          aria-label="Toggle AI chat"
+          disabled={loading}
+        >
+          <span class="toggle-knob"></span>
+        </button>
+        <div class="toggle-label">
+          <span class="toggle-title">Enable AI chat panel</span>
+          <span class="toggle-subtitle">Show the chat assistant toggle in the toolbar.</span>
+        </div>
+      </div>
+
+      <div class="api-key-row" style="margin-top: 14px;">
+        <label for="anthropic-api-key" class="field-label">Anthropic API key</label>
+        <div class="api-key-input-row">
+          <input
+            id="anthropic-api-key"
+            type="password"
+            bind:value={apiKeyValue}
+            placeholder="sk-ant-..."
+            class="api-key-input"
+            autocomplete="off"
+          />
+          <button
+            class="btn-primary btn-sm"
+            onclick={async () => {
+              await setSetting('anthropic_api_key', apiKeyValue);
+              apiKeySaved = true;
+              setTimeout(() => apiKeySaved = false, 2000);
+            }}
+          >
+            {apiKeySaved ? 'Saved ✓' : 'Save'}
+          </button>
+        </div>
+        <span class="toggle-subtitle">Stored locally in your app database. Never sent anywhere except api.anthropic.com.</span>
+      </div>
+    </section>
+
     <section class="section">
       <h3>MCP Access</h3>
       <div class="toggle-row">
@@ -49,7 +116,25 @@
         </button>
         <div class="toggle-label">
           <span class="toggle-title">Allow MCP clients to read your data</span>
-          <span class="toggle-subtitle">When enabled, AI assistants with the MCP server configured can query your lab results and symptom logs (read-only).</span>
+          <span class="toggle-subtitle">When enabled, AI assistants with the MCP server configured can query your lab results and symptom logs.</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" style="margin-top: 12px;">
+        <button
+          class="toggle"
+          class:on={mcpWriteEnabled}
+          onclick={toggleMcpWrite}
+          disabled={loading || !mcpEnabled}
+          role="switch"
+          aria-checked={mcpWriteEnabled}
+          aria-label="Toggle MCP write access"
+        >
+          <span class="toggle-knob"></span>
+        </button>
+        <div class="toggle-label">
+          <span class="toggle-title">Allow MCP clients to write data</span>
+          <span class="toggle-subtitle">When enabled, AI assistants can insert new lab sessions and results (e.g. from a pasted lab report).</span>
         </div>
       </div>
     </section>
@@ -62,7 +147,7 @@
 
       {#if setupExpanded}
         <div class="setup-content">
-          <p class="setup-desc">The MCP server gives AI assistants read-only access to your tracking data via the Model Context Protocol.</p>
+          <p class="setup-desc">The MCP server gives AI assistants access to your tracking data via the Model Context Protocol. Read access lets them query data; write access lets them insert new lab results.</p>
 
           <h4>Available tools</h4>
           <ul class="tools-list">
@@ -71,6 +156,7 @@
             <li>Symptom history with severity</li>
             <li>Test trends over time</li>
             <li>Daily wellness summaries</li>
+            <li>Insert lab session with results (requires write access)</li>
           </ul>
 
           <h4>Binary path</h4>
@@ -302,5 +388,55 @@
     overflow-x: auto;
     white-space: pre;
     margin: 4px 0 8px;
+  }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .api-key-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .api-key-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .api-key-input {
+    flex: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
   }
 </style>

@@ -33,9 +33,23 @@ pub fn run() {
             commands::symptoms::reorder_symptoms,
             commands::symptoms::get_symptom_log,
             commands::symptoms::save_symptom_log,
+            commands::diagnoses::get_diagnoses,
+            commands::diagnoses::save_diagnosis,
+            commands::diagnoses::delete_diagnosis,
             commands::export::export_data,
             commands::settings::get_setting,
             commands::settings::set_setting,
+            commands::artifacts::get_artifacts,
+            commands::artifacts::get_artifact,
+            commands::artifacts::save_artifact_paste,
+            commands::artifacts::save_artifact_file,
+            commands::artifacts::delete_artifact,
+            commands::artifacts::extract_labs_from_artifact,
+            commands::chat::get_chat_history,
+            commands::chat::clear_chat_history,
+            commands::chat::get_memory,
+            commands::chat::save_memory,
+            commands::chat::send_chat_message,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

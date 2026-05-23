@@ -88,10 +88,43 @@ impl Database {
             );
 
             INSERT OR IGNORE INTO settings (key, value) VALUES ('mcp_enabled', 'true');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('mcp_write_enabled', 'false');
 
             CREATE INDEX IF NOT EXISTS idx_lab_results_session ON lab_results(session_id);
             CREATE INDEX IF NOT EXISTS idx_lab_results_test ON lab_results(test_name);
             CREATE INDEX IF NOT EXISTS idx_symptom_logs_date ON symptom_logs(log_date);
+
+            CREATE TABLE IF NOT EXISTS artifacts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                source_type TEXT NOT NULL DEFAULT 'paste',
+                content_type TEXT NOT NULL DEFAULT 'text',
+                text_content TEXT NOT NULL DEFAULT '',
+                file_path TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+
+            CREATE TABLE IF NOT EXISTS chat_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                role TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+
+            CREATE TABLE IF NOT EXISTS diagnoses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                short_name TEXT NOT NULL DEFAULT '',
+                onset_date TEXT,
+                resolution_date TEXT,
+                chronic INTEGER NOT NULL DEFAULT 1,
+                source TEXT NOT NULL DEFAULT '',
+                details TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('anthropic_api_key', '');
+            INSERT OR IGNORE INTO settings (key, value) VALUES ('chat_enabled', 'true');
             "
         )?;
 
@@ -133,4 +166,16 @@ impl Database {
 pub fn db_path() -> PathBuf {
     let base = dirs::data_local_dir().expect("Could not determine local data directory");
     base.join("symptom-test-tracker").join("tracker.db")
+}
+
+pub fn artifacts_dir() -> PathBuf {
+    let base = dirs::data_local_dir().expect("Could not determine local data directory");
+    let dir = base.join("symptom-test-tracker").join("artifacts");
+    std::fs::create_dir_all(&dir).expect("Failed to create artifacts directory");
+    dir
+}
+
+pub fn memory_path() -> PathBuf {
+    let base = dirs::data_local_dir().expect("Could not determine local data directory");
+    base.join("symptom-test-tracker").join("memory.md")
 }
