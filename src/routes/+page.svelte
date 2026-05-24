@@ -111,25 +111,8 @@
 <div class="app-layout">
   <header class="toolbar">
     <div class="toolbar-left">
-    <div class="toolbar-title">Symptom Tracker</div>
-    <button class="about-btn" onclick={() => navigate('welcome')} title="About this app">?</button>
-    <button class="about-btn" onclick={() => settingsOpen = true} title="Settings">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.902 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.421 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.421-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.421-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.116l.094-.318z"/>
-      </svg>
-    </button>
-    {#if chatEnabled}
-      <button
-        class="chat-toggle-btn"
-        class:active={chatOpen}
-        onclick={() => chatOpen = !chatOpen}
-        title="AI Assistant"
-      >
-        ✦ Chat
-      </button>
-    {/if}
-  </div>
+      <div class="toolbar-title">Symptom Tracker</div>
+    </div>
     <nav class="toolbar-nav">
       {#each navGroups as group}
         <div class="btn-group">
@@ -147,6 +130,28 @@
           </div>
         </div>
       {/each}
+
+      <div class="toolbar-nav-end">
+        <button class="about-btn" onclick={() => navigate('welcome')} title="About this app">?</button>
+        <button class="about-btn" onclick={() => settingsOpen = true} title="Settings">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.902 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.421 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.421-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.421-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.116l.094-.318z"/>
+          </svg>
+        </button>
+        {#if chatEnabled}
+          <button
+            class="chat-icon-btn"
+            class:active={chatOpen}
+            onclick={() => chatOpen = !chatOpen}
+            title="AI Assistant"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+            </svg>
+          </button>
+        {/if}
+      </div>
     </nav>
   </header>
 
@@ -257,7 +262,7 @@
     display: flex;
     align-items: center;
     gap: 24px;
-    padding: 16px 24px;
+    padding: 12px 24px;
     border-bottom: 1px solid var(--color-border);
     flex-shrink: 0;
   }
@@ -266,8 +271,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-right: 8px;
+    padding-right: 16px;
     border-right: 1px solid var(--color-border);
+    flex-shrink: 0;
   }
 
   .toolbar-title {
@@ -276,49 +282,34 @@
     white-space: nowrap;
   }
 
-  .about-btn {
-    width: 22px;
-    height: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-border);
-    border-radius: 50%;
-    background: none;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .about-btn:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-    background: none;
-  }
-
   .toolbar-nav {
     display: flex;
     gap: 20px;
-    align-items: center;
+    align-items: flex-end;
+    flex: 1;
   }
 
-  .btn-group {
+  .toolbar-nav-end {
+    margin-left: auto;
     display: flex;
     align-items: center;
     gap: 6px;
   }
 
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
   .group-label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     color: var(--color-text-muted);
-    margin-right: 2px;
+    padding-left: 2px;
   }
 
   .group-buttons {
@@ -369,6 +360,30 @@
     color: white;
     border-color: var(--color-accent);
     z-index: 1;
+  }
+
+  .about-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .about-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: none;
   }
 
   .body-area {
@@ -459,24 +474,27 @@
     overflow-y: auto;
   }
 
-  .chat-toggle-btn {
-    padding: 4px 10px;
-    font-size: 12px;
+  .chat-icon-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     background: var(--color-surface);
     color: var(--color-text-muted);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    padding: 0;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .chat-toggle-btn:hover {
+
+  .chat-icon-btn:hover {
     background: var(--color-surface-raised);
     color: var(--color-text);
   }
-  .chat-toggle-btn.active {
+
+  .chat-icon-btn.active {
     background: var(--color-accent);
     color: white;
     border-color: var(--color-accent);
