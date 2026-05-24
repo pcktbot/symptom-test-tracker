@@ -165,7 +165,7 @@
       {:else if currentView === 'symptoms'}
         <SymptomEntry onNavigate={navigate} openSymptomConfig={() => symptomConfigOpen = true} />
       {:else if currentView === 'artifacts'}
-        <Artifacts onNavigate={navigate} />
+        <Artifacts onNavigate={navigate} openExport={() => exportOpen = true} />
       {:else if currentView === 'diagnoses'}
         <Diagnoses />
       {/if}
