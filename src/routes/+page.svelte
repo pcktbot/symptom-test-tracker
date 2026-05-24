@@ -163,7 +163,7 @@
       {:else if currentView === 'trends'}
         <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => labConfigOpen = true} />
       {:else if currentView === 'symptoms'}
-        <SymptomEntry onNavigate={navigate} />
+        <SymptomEntry onNavigate={navigate} openSymptomConfig={() => symptomConfigOpen = true} />
       {:else if currentView === 'artifacts'}
         <Artifacts onNavigate={navigate} />
       {:else if currentView === 'diagnoses'}
