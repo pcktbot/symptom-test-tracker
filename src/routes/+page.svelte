@@ -29,6 +29,9 @@
   let exportOpen = $state(false);
   let chatEnabled = $state(false);
 
+  type FontSize = 'sm' | 'md' | 'lg';
+  let fontSize: FontSize = $state('md');
+
   const CHAT_MIN_WIDTH = 240;
   const CHAT_MAX_WIDTH = 600;
   let chatWidth = $state(320);
@@ -105,11 +108,41 @@
     Promise.all([
       getSetting('chat_enabled'),
       getSetting('chat_width'),
-    ]).then(([chatEnabledVal, chatWidthVal]) => {
+      getSetting('font_size'),
+    ]).then(([chatEnabledVal, chatWidthVal, fontSizeVal]) => {
       chatEnabled = chatEnabledVal === 'true';
       const parsed = parseInt(chatWidthVal);
       if (!isNaN(parsed)) chatWidth = Math.max(CHAT_MIN_WIDTH, Math.min(CHAT_MAX_WIDTH, parsed));
+      if (fontSizeVal === 'sm' || fontSizeVal === 'md' || fontSizeVal === 'lg') fontSize = fontSizeVal;
+      document.body.dataset.fontSize = fontSize;
     });
+  });
+
+  $effect(() => {
+    document.body.dataset.fontSize = fontSize;
+  });
+
+  $effect(() => {
+    function handleKeydown(e: KeyboardEvent) {
+      if (!e.metaKey) return;
+      if (e.key === '=' || e.key === '+') {
+        e.preventDefault();
+        const next: FontSize = fontSize === 'sm' ? 'md' : fontSize === 'md' ? 'lg' : 'lg';
+        fontSize = next;
+        setSetting('font_size', fontSize);
+      } else if (e.key === '-') {
+        e.preventDefault();
+        const next: FontSize = fontSize === 'lg' ? 'md' : fontSize === 'md' ? 'sm' : 'sm';
+        fontSize = next;
+        setSetting('font_size', fontSize);
+      } else if (e.key === '0') {
+        e.preventDefault();
+        fontSize = 'md';
+        setSetting('font_size', 'md');
+      }
+    }
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
   });
 
   type NavGroup = { label: string; items: { view: View; label: string }[] };
@@ -277,7 +310,11 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="settings-backdrop" onclick={() => settingsOpen = false} onkeydown={() => {}}></div>
     <div class="settings-modal">
-      <Settings onClose={() => settingsOpen = false} />
+      <Settings
+        onClose={() => settingsOpen = false}
+        {fontSize}
+        onFontSizeChange={(size) => { fontSize = size; setSetting('font_size', size); }}
+      />
     </div>
   {/if}
 </div>
