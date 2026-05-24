@@ -16,6 +16,8 @@
   import SymptomEditor from '$lib/views/SymptomEditor.svelte';
   import Export from '$lib/views/Export.svelte';
   import { getSetting, setSetting } from '$lib/db';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
+  import { LogicalSize, LogicalPosition } from '@tauri-apps/api/dpi';
 
   const welcomeSeen = typeof localStorage !== 'undefined' && localStorage.getItem('welcome_seen') === 'true';
   let currentView: View = $state(welcomeSeen ? 'dashboard' : 'welcome');
@@ -31,6 +33,8 @@
 
   type FontSize = 'sm' | 'md' | 'lg';
   let fontSize: FontSize = $state('md');
+
+  let saveDimensionsTimer: ReturnType<typeof setTimeout> | null = null;
 
   const CHAT_MIN_WIDTH = 240;
   const CHAT_MAX_WIDTH = 600;
@@ -143,6 +147,50 @@
     }
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
+  });
+
+  $effect(() => {
+    Promise.all([
+      getSetting('window_width'),
+      getSetting('window_height'),
+      getSetting('window_x'),
+      getSetting('window_y'),
+    ]).then(([w, h, x, y]) => {
+      const win = getCurrentWindow();
+      const width = parseInt(w);
+      const height = parseInt(h);
+      const posX = parseInt(x);
+      const posY = parseInt(y);
+      if (!isNaN(width) && !isNaN(height) && width >= 900 && height >= 600) {
+        win.setSize(new LogicalSize(width, height));
+      }
+      if (!isNaN(posX) && !isNaN(posY)) {
+        win.setPosition(new LogicalPosition(posX, posY));
+      }
+    });
+  });
+
+  function scheduleSaveDimensions() {
+    if (saveDimensionsTimer) clearTimeout(saveDimensionsTimer);
+    saveDimensionsTimer = setTimeout(async () => {
+      const win = getCurrentWindow();
+      const size = await win.innerSize();
+      const pos = await win.innerPosition();
+      setSetting('window_width', String(size.width));
+      setSetting('window_height', String(size.height));
+      setSetting('window_x', String(pos.x));
+      setSetting('window_y', String(pos.y));
+    }, 500);
+  }
+
+  $effect(() => {
+    const win = getCurrentWindow();
+    const unlisten = win.listen('tauri://resize', scheduleSaveDimensions);
+    const unlistenMove = win.listen('tauri://move', scheduleSaveDimensions);
+    return () => {
+      unlisten.then(f => f());
+      unlistenMove.then(f => f());
+    };
   });
 
   type NavGroup = { label: string; items: { view: View; label: string }[] };
