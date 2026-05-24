@@ -15,7 +15,7 @@
   import LabManage from '$lib/views/LabManage.svelte';
   import SymptomEditor from '$lib/views/SymptomEditor.svelte';
   import Export from '$lib/views/Export.svelte';
-  import { getSetting } from '$lib/db';
+  import { getSetting, setSetting } from '$lib/db';
 
   const welcomeSeen = typeof localStorage !== 'undefined' && localStorage.getItem('welcome_seen') === 'true';
   let currentView: View = $state(welcomeSeen ? 'dashboard' : 'welcome');
@@ -28,6 +28,10 @@
   let symptomConfigOpen = $state(false);
   let exportOpen = $state(false);
   let chatEnabled = $state(false);
+
+  const CHAT_MIN_WIDTH = 240;
+  const CHAT_MAX_WIDTH = 600;
+  let chatWidth = $state(320);
 
   // Track body area width to decide inline vs overlay
   // We measure body-area (not content) to avoid resize loops when glossary toggles
@@ -55,6 +59,26 @@
     currentView = 'dashboard';
   }
 
+  function startChatResize(e: MouseEvent) {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = chatWidth;
+
+    function onMove(e: MouseEvent) {
+      const delta = startX - e.clientX;
+      chatWidth = Math.max(CHAT_MIN_WIDTH, Math.min(CHAT_MAX_WIDTH, startWidth + delta));
+    }
+
+    function onUp() {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      setSetting('chat_width', String(chatWidth));
+    }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }
+
   function openGlossary(testName?: string) {
     glossaryTest = testName ?? null;
     glossaryOpen = true;
@@ -78,7 +102,14 @@
   });
 
   $effect(() => {
-    getSetting('chat_enabled').then(v => chatEnabled = v === 'true');
+    Promise.all([
+      getSetting('chat_enabled'),
+      getSetting('chat_width'),
+    ]).then(([chatEnabledVal, chatWidthVal]) => {
+      chatEnabled = chatEnabledVal === 'true';
+      const parsed = parseInt(chatWidthVal);
+      if (!isNaN(parsed)) chatWidth = Math.max(CHAT_MIN_WIDTH, Math.min(CHAT_MAX_WIDTH, parsed));
+    });
   });
 
   type NavGroup = { label: string; items: { view: View; label: string }[] };
@@ -183,7 +214,9 @@
     {/if}
 
     {#if chatOpen}
-      <div class="chat-inline" style="width: 320px">
+      <div class="chat-inline" style="width: {chatWidth}px">
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div class="chat-resize-handle" onmousedown={startChatResize}></div>
         <Chat onClose={() => chatOpen = false} />
       </div>
     {/if}
@@ -446,6 +479,24 @@
     flex-shrink: 0;
     overflow: hidden;
     height: 100%;
+    position: relative;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .chat-resize-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    cursor: col-resize;
+    z-index: 10;
+  }
+
+  .chat-resize-handle:hover,
+  .chat-resize-handle:active {
+    background: var(--color-accent);
+    opacity: 0.4;
   }
 
   .config-panel-inline {
