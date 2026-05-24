@@ -157,7 +157,7 @@
       {:else if currentView === 'dashboard'}
         <Dashboard onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'lab-results'}
-        <LabResults onNavigate={navigate} {openGlossary} />
+        <LabResults onNavigate={navigate} {openGlossary} openLabConfig={() => labConfigOpen = true} />
       {:else if currentView === 'lab-entry'}
         <LabEntry sessionId={editSessionId} onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'trends'}
