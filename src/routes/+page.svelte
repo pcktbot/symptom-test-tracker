@@ -12,6 +12,9 @@
   import Diagnoses from '$lib/views/Diagnoses.svelte';
   import Artifacts from '$lib/views/Artifacts.svelte';
   import Chat from '$lib/views/Chat.svelte';
+  import LabManage from '$lib/views/LabManage.svelte';
+  import SymptomEditor from '$lib/views/SymptomEditor.svelte';
+  import Export from '$lib/views/Export.svelte';
   import { getSetting } from '$lib/db';
 
   const welcomeSeen = typeof localStorage !== 'undefined' && localStorage.getItem('welcome_seen') === 'true';
@@ -21,6 +24,9 @@
   let glossaryOpen = $state(false);
   let glossaryTest: string | null = $state(null);
   let chatOpen = $state(false);
+  let labConfigOpen = $state(false);
+  let symptomConfigOpen = $state(false);
+  let exportOpen = $state(false);
   let chatEnabled = $state(false);
 
   // Track body area width to decide inline vs overlay
@@ -30,9 +36,14 @@
 
   const GLOSSARY_WIDTH = 340;
   const CONTENT_MAX = 960; // largest max-width among views
+  const CONFIG_PANEL_WIDTH = 400;
+  const EXPORT_PANEL_WIDTH = 360;
 
   // Glossary fits inline when the body area is wide enough for both
   let glossaryInline = $derived(bodyWidth >= CONTENT_MAX + GLOSSARY_WIDTH + 48);
+  let labConfigInline = $derived(bodyWidth >= CONTENT_MAX + CONFIG_PANEL_WIDTH + 48);
+  let symptomConfigInline = $derived(bodyWidth >= CONTENT_MAX + CONFIG_PANEL_WIDTH + 48);
+  let exportInline = $derived(bodyWidth >= CONTENT_MAX + EXPORT_PANEL_WIDTH + 48);
 
   function navigate(view: View, sessionId?: number | null) {
     currentView = view;
@@ -171,6 +182,24 @@
         <Chat onClose={() => chatOpen = false} />
       </div>
     {/if}
+
+    {#if labConfigOpen && labConfigInline}
+      <div class="config-panel-inline" style="width: {CONFIG_PANEL_WIDTH}px">
+        <LabManage onClose={() => labConfigOpen = false} />
+      </div>
+    {/if}
+
+    {#if symptomConfigOpen && symptomConfigInline}
+      <div class="config-panel-inline" style="width: {CONFIG_PANEL_WIDTH}px">
+        <SymptomEditor onClose={() => symptomConfigOpen = false} />
+      </div>
+    {/if}
+
+    {#if exportOpen && exportInline}
+      <div class="config-panel-inline" style="width: {EXPORT_PANEL_WIDTH}px">
+        <Export onClose={() => exportOpen = false} />
+      </div>
+    {/if}
   </div>
 
   {#if glossaryOpen && !glossaryInline}
@@ -179,6 +208,30 @@
     </div>
     <div class="glossary-overlay" style="width: {GLOSSARY_WIDTH}px">
       <Glossary activeTest={glossaryTest} onClose={closeGlossary} />
+    </div>
+  {/if}
+
+  {#if labConfigOpen && !labConfigInline}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="panel-overlay-backdrop" onclick={() => labConfigOpen = false} onkeydown={() => {}}></div>
+    <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
+      <LabManage onClose={() => labConfigOpen = false} />
+    </div>
+  {/if}
+
+  {#if symptomConfigOpen && !symptomConfigInline}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="panel-overlay-backdrop" onclick={() => symptomConfigOpen = false} onkeydown={() => {}}></div>
+    <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
+      <SymptomEditor onClose={() => symptomConfigOpen = false} />
+    </div>
+  {/if}
+
+  {#if exportOpen && !exportInline}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="panel-overlay-backdrop" onclick={() => exportOpen = false} onkeydown={() => {}}></div>
+    <div class="panel-overlay" style="width: {EXPORT_PANEL_WIDTH}px">
+      <Export onClose={() => exportOpen = false} />
     </div>
   {/if}
 
@@ -378,6 +431,32 @@
     flex-shrink: 0;
     overflow: hidden;
     height: 100%;
+  }
+
+  .config-panel-inline {
+    flex-shrink: 0;
+    overflow-y: auto;
+    height: 100%;
+    border-left: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .panel-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 90;
+  }
+
+  .panel-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    background: var(--color-surface);
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
   }
 
   .chat-toggle-btn {
