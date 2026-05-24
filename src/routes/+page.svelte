@@ -161,7 +161,7 @@
       {:else if currentView === 'lab-entry'}
         <LabEntry sessionId={editSessionId} onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'trends'}
-        <Trends {openGlossary} onNavigate={navigate} />
+        <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => labConfigOpen = true} />
       {:else if currentView === 'symptoms'}
         <SymptomEntry onNavigate={navigate} />
       {:else if currentView === 'artifacts'}
