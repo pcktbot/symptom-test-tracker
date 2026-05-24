@@ -3,6 +3,8 @@
   import { getSymptoms, saveSymptom, deleteSymptom, reorderSymptoms } from '$lib/db';
   import type { Symptom } from '$lib/types';
 
+  let { onClose }: { onClose: () => void } = $props();
+
   let symptoms: Symptom[] = $state([]);
   let loading = $state(true);
 
@@ -118,7 +120,10 @@
 </script>
 
 <div class="symptom-editor">
-  <h1>Manage Symptoms</h1>
+  <div class="panel-header">
+    <h2>Configure Symptoms</h2>
+    <button class="close-btn" onclick={onClose} aria-label="Close">&times;</button>
+  </div>
 
   <div class="add-form">
     <h3>Add New Symptom</h3>
@@ -185,7 +190,38 @@
 <style>
   .symptom-editor { max-width: 900px; }
 
-  h1 { margin-bottom: 20px; }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .panel-header h2 {
+    margin: 0;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+  }
+
+  .close-btn:hover {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+  }
 
   .add-form {
     margin-bottom: 24px;
