@@ -16,6 +16,7 @@
   let currentTags = $state<string[]>([]);
 
   $effect(() => {
+    date; // reset tags only when navigating to a different day
     currentTags = existing?.tags ?? [];
   });
 
