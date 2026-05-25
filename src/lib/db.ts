@@ -16,6 +16,8 @@ import type {
   Diagnosis,
   ExtractionResult,
   ChatMessage,
+  DailyRating,
+  HeatmapConfig,
 } from './types';
 
 // Lab commands
@@ -188,4 +190,25 @@ export async function getMemory(): Promise<string> {
 
 export async function saveMemory(content: string): Promise<void> {
   return invoke('save_memory', { content });
+}
+
+// Daily ratings
+export async function getDailyRatings(year: number): Promise<DailyRating[]> {
+  return invoke('get_daily_ratings', { year });
+}
+
+export async function saveDailyRating(date: string, score: number, tags: string[]): Promise<void> {
+  return invoke('save_daily_rating', { date, score, tags });
+}
+
+export async function getAllTags(): Promise<string[]> {
+  return invoke('get_all_tags');
+}
+
+export async function getHeatmapConfig(): Promise<HeatmapConfig> {
+  return invoke('get_heatmap_config');
+}
+
+export async function saveHeatmapConfig(config: HeatmapConfig, oldSteps: number | null): Promise<void> {
+  return invoke('save_heatmap_config', { config, oldSteps });
 }

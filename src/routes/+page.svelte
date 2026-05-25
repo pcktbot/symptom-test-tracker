@@ -206,7 +206,7 @@
     {
       label: 'Symptoms',
       items: [
-        { view: 'symptoms', label: 'Log' },
+        { view: 'daily-rating', label: 'Log' },
       ],
     },
     {
@@ -278,7 +278,7 @@
         <LabEntry sessionId={editSessionId} onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'trends'}
         <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => activePanel = 'labConfig'} />
-      {:else if currentView === 'symptoms'}
+      {:else if currentView === 'daily-rating'}
         <SymptomEntry onNavigate={navigate} openSymptomConfig={() => activePanel = 'symptomConfig'} />
       {:else if currentView === 'artifacts'}
         <Artifacts onNavigate={navigate} openExport={() => activePanel = 'export'} />

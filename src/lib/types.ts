@@ -84,7 +84,7 @@ export interface AbnormalResult extends LabResult {
   prev_flag: string;
 }
 
-export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'symptoms' | 'welcome' | 'artifacts' | 'diagnoses';
+export type View = 'dashboard' | 'lab-results' | 'lab-entry' | 'trends' | 'daily-rating' | 'welcome' | 'artifacts' | 'diagnoses';
 
 export type Flag = 'N' | 'L' | 'H' | 'LL' | 'HH';
 
@@ -155,4 +155,16 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   created_at: string;
+}
+
+export interface DailyRating {
+  log_date: string;
+  wellness_score: number; // 1-based: 1 = worst, N = best
+  tags: string[];
+}
+
+export interface HeatmapConfig {
+  steps: number;
+  labels: string[];
+  colors: string[];
 }
