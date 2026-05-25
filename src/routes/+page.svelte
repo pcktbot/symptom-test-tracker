@@ -5,7 +5,7 @@
   import LabResults from '$lib/views/LabResults.svelte';
   import LabEntry from '$lib/views/LabEntry.svelte';
   import Trends from '$lib/views/Trends.svelte';
-  import SymptomEntry from '$lib/views/SymptomEntry.svelte';
+  import DailyRating from '$lib/views/DailyRating.svelte';
   import Glossary from '$lib/views/Glossary.svelte';
   import Welcome from '$lib/views/Welcome.svelte';
   import Settings from '$lib/views/Settings.svelte';
@@ -13,7 +13,6 @@
   import Artifacts from '$lib/views/Artifacts.svelte';
   import Chat from '$lib/views/Chat.svelte';
   import LabManage from '$lib/views/LabManage.svelte';
-  import SymptomEditor from '$lib/views/SymptomEditor.svelte';
   import Export from '$lib/views/Export.svelte';
   import { getSetting, setSetting } from '$lib/db';
   import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -26,7 +25,7 @@
   let glossaryOpen = $state(false);
   let glossaryTest: string | null = $state(null);
   let chatOpen = $state(false);
-  type ActivePanel = 'labConfig' | 'symptomConfig' | 'export' | null;
+  type ActivePanel = 'labConfig' | 'export' | null;
   let activePanel: ActivePanel = $state(null);
   let chatEnabled = $state(false);
 
@@ -279,7 +278,7 @@
       {:else if currentView === 'trends'}
         <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => activePanel = 'labConfig'} />
       {:else if currentView === 'daily-rating'}
-        <SymptomEntry onNavigate={navigate} openSymptomConfig={() => activePanel = 'symptomConfig'} />
+        <DailyRating />
       {:else if currentView === 'artifacts'}
         <Artifacts onNavigate={navigate} openExport={() => activePanel = 'export'} />
       {:else if currentView === 'diagnoses'}
@@ -307,12 +306,6 @@
       </div>
     {/if}
 
-    {#if activePanel === 'symptomConfig' && configPanelInline}
-      <div class="config-panel-inline" style="width: {CONFIG_PANEL_WIDTH}px">
-        <SymptomEditor onClose={() => activePanel = null} />
-      </div>
-    {/if}
-
     {#if activePanel === 'export' && exportPanelInline}
       <div class="config-panel-inline" style="width: {EXPORT_PANEL_WIDTH}px">
         <Export onClose={() => activePanel = null} />
@@ -334,14 +327,6 @@
     <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
     <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
       <LabManage onClose={() => activePanel = null} />
-    </div>
-  {/if}
-
-  {#if activePanel === 'symptomConfig' && !configPanelInline}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
-    <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
-      <SymptomEditor onClose={() => activePanel = null} />
     </div>
   {/if}
 
