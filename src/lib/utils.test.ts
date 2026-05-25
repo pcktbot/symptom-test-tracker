@@ -110,8 +110,8 @@ describe('LAB_PANELS', () => {
     expect(names).toContain('Coagulation');
   });
 
-  it('has 7 panels', () => {
-    expect(LAB_PANELS).toHaveLength(7);
+  it('has 8 panels', () => {
+    expect(LAB_PANELS).toHaveLength(8);
   });
 
   it('CBC panel has 14 tests', () => {

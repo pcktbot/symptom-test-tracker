@@ -9,9 +9,9 @@ vi.mock('./db', () => ({
 const mockGetCustomLabTests = vi.mocked(getCustomLabTests);
 
 describe('GLOSSARY', () => {
-  it('contains entries for all 7 panels', () => {
+  it('contains entries for all 8 panels', () => {
     const panels = new Set(GLOSSARY.map(e => e.panel));
-    expect(panels.size).toBe(7);
+    expect(panels.size).toBe(8);
     expect(panels).toContain('CBC');
     expect(panels).toContain('Lipids');
     expect(panels).toContain('Inflammation');
@@ -19,6 +19,7 @@ describe('GLOSSARY', () => {
     expect(panels).toContain('Metabolic / BMP');
     expect(panels).toContain('Thyroid');
     expect(panels).toContain('Coagulation');
+    expect(panels).toContain('Lupus Anticoagulant (LA)');
   });
 
   it('every entry has name, panel, description, and clinical fields', () => {
@@ -65,7 +66,7 @@ describe('getGlossaryEntry', () => {
 describe('getGlossaryByPanel', () => {
   it('groups entries by panel name', () => {
     const groups = getGlossaryByPanel();
-    expect(Object.keys(groups)).toHaveLength(7);
+    expect(Object.keys(groups)).toHaveLength(8);
   });
 
   it('CBC group contains all CBC entries', () => {
@@ -99,7 +100,7 @@ describe('getMergedGlossary', () => {
     mockGetCustomLabTests.mockResolvedValue([]);
 
     const groups = await getMergedGlossary();
-    expect(Object.keys(groups)).toHaveLength(7);
+    expect(Object.keys(groups)).toHaveLength(8);
   });
 
   it('adds custom test with description to glossary', async () => {
