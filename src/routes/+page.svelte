@@ -26,9 +26,8 @@
   let glossaryOpen = $state(false);
   let glossaryTest: string | null = $state(null);
   let chatOpen = $state(false);
-  let labConfigOpen = $state(false);
-  let symptomConfigOpen = $state(false);
-  let exportOpen = $state(false);
+  type ActivePanel = 'labConfig' | 'symptomConfig' | 'export' | null;
+  let activePanel: ActivePanel = $state(null);
   let chatEnabled = $state(false);
 
   type FontSize = 'sm' | 'md' | 'lg';
@@ -52,9 +51,8 @@
 
   // Glossary fits inline when the body area is wide enough for both
   let glossaryInline = $derived(bodyWidth >= CONTENT_MAX + GLOSSARY_WIDTH + 48);
-  let labConfigInline = $derived(bodyWidth >= CONTENT_MAX + CONFIG_PANEL_WIDTH + 48);
-  let symptomConfigInline = $derived(bodyWidth >= CONTENT_MAX + CONFIG_PANEL_WIDTH + 48);
-  let exportInline = $derived(bodyWidth >= CONTENT_MAX + EXPORT_PANEL_WIDTH + 48);
+  let configPanelInline = $derived(bodyWidth >= CONTENT_MAX + CONFIG_PANEL_WIDTH + 48);
+  let exportPanelInline = $derived(bodyWidth >= CONTENT_MAX + EXPORT_PANEL_WIDTH + 48);
 
   function navigate(view: View, sessionId?: number | null) {
     currentView = view;
@@ -174,12 +172,13 @@
     if (saveDimensionsTimer) clearTimeout(saveDimensionsTimer);
     saveDimensionsTimer = setTimeout(async () => {
       const win = getCurrentWindow();
-      const size = await win.innerSize();
-      const pos = await win.innerPosition();
-      setSetting('window_width', String(size.width));
-      setSetting('window_height', String(size.height));
-      setSetting('window_x', String(pos.x));
-      setSetting('window_y', String(pos.y));
+      const factor = await win.scaleFactor();
+      const size = (await win.innerSize()).toLogical(factor);
+      const pos = (await win.innerPosition()).toLogical(factor);
+      setSetting('window_width', String(Math.round(size.width)));
+      setSetting('window_height', String(Math.round(size.height)));
+      setSetting('window_x', String(Math.round(pos.x)));
+      setSetting('window_y', String(Math.round(pos.y)));
     }, 500);
   }
 
@@ -274,15 +273,15 @@
       {:else if currentView === 'dashboard'}
         <Dashboard onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'lab-results'}
-        <LabResults onNavigate={navigate} {openGlossary} openLabConfig={() => labConfigOpen = true} />
+        <LabResults onNavigate={navigate} {openGlossary} openLabConfig={() => activePanel = 'labConfig'} />
       {:else if currentView === 'lab-entry'}
         <LabEntry sessionId={editSessionId} onNavigate={navigate} {openGlossary} />
       {:else if currentView === 'trends'}
-        <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => labConfigOpen = true} />
+        <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => activePanel = 'labConfig'} />
       {:else if currentView === 'symptoms'}
-        <SymptomEntry onNavigate={navigate} openSymptomConfig={() => symptomConfigOpen = true} />
+        <SymptomEntry onNavigate={navigate} openSymptomConfig={() => activePanel = 'symptomConfig'} />
       {:else if currentView === 'artifacts'}
-        <Artifacts onNavigate={navigate} openExport={() => exportOpen = true} />
+        <Artifacts onNavigate={navigate} openExport={() => activePanel = 'export'} />
       {:else if currentView === 'diagnoses'}
         <Diagnoses />
       {/if}
@@ -302,21 +301,21 @@
       </div>
     {/if}
 
-    {#if labConfigOpen && labConfigInline}
+    {#if activePanel === 'labConfig' && configPanelInline}
       <div class="config-panel-inline" style="width: {CONFIG_PANEL_WIDTH}px">
-        <LabManage onClose={() => labConfigOpen = false} />
+        <LabManage onClose={() => activePanel = null} />
       </div>
     {/if}
 
-    {#if symptomConfigOpen && symptomConfigInline}
+    {#if activePanel === 'symptomConfig' && configPanelInline}
       <div class="config-panel-inline" style="width: {CONFIG_PANEL_WIDTH}px">
-        <SymptomEditor onClose={() => symptomConfigOpen = false} />
+        <SymptomEditor onClose={() => activePanel = null} />
       </div>
     {/if}
 
-    {#if exportOpen && exportInline}
+    {#if activePanel === 'export' && exportPanelInline}
       <div class="config-panel-inline" style="width: {EXPORT_PANEL_WIDTH}px">
-        <Export onClose={() => exportOpen = false} />
+        <Export onClose={() => activePanel = null} />
       </div>
     {/if}
   </div>
@@ -330,27 +329,27 @@
     </div>
   {/if}
 
-  {#if labConfigOpen && !labConfigInline}
+  {#if activePanel === 'labConfig' && !configPanelInline}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="panel-overlay-backdrop" onclick={() => labConfigOpen = false} onkeydown={() => {}}></div>
+    <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
     <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
-      <LabManage onClose={() => labConfigOpen = false} />
+      <LabManage onClose={() => activePanel = null} />
     </div>
   {/if}
 
-  {#if symptomConfigOpen && !symptomConfigInline}
+  {#if activePanel === 'symptomConfig' && !configPanelInline}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="panel-overlay-backdrop" onclick={() => symptomConfigOpen = false} onkeydown={() => {}}></div>
+    <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
     <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
-      <SymptomEditor onClose={() => symptomConfigOpen = false} />
+      <SymptomEditor onClose={() => activePanel = null} />
     </div>
   {/if}
 
-  {#if exportOpen && !exportInline}
+  {#if activePanel === 'export' && !exportPanelInline}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="panel-overlay-backdrop" onclick={() => exportOpen = false} onkeydown={() => {}}></div>
+    <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
     <div class="panel-overlay" style="width: {EXPORT_PANEL_WIDTH}px">
-      <Export onClose={() => exportOpen = false} />
+      <Export onClose={() => activePanel = null} />
     </div>
   {/if}
 
