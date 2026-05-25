@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { getLatestAbnormalWithPrevious } from '$lib/db';
-  import { flagClass } from '$lib/utils';
+  import { flagClass, formatDate } from '$lib/utils';
   import type { AbnormalResult, View } from '$lib/types';
   import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
 
@@ -97,6 +97,7 @@
             <tr>
               <th>Test</th>
               <th>Value</th>
+              <th>Date</th>
               <th>Previous</th>
               <th>Change</th>
               <th>Unit</th>
@@ -119,6 +120,7 @@
                     {r.text_value}
                   {/if}
                 </td>
+                <td class="test-date">{formatDate(r.test_date)}</td>
                 <td class="prev-value">
                   {#if r.prev_value != null}
                     {r.prev_value}
@@ -264,6 +266,7 @@
     gap: 6px;
   }
   .value { font-family: var(--font-mono); }
+  .test-date { color: var(--color-text-muted); font-size: 12px; white-space: nowrap; }
   .prev-value { font-family: var(--font-mono); color: var(--color-text-muted); font-size: 12px; }
   .unit { color: var(--color-text-muted); }
   .ref-range { color: var(--color-text-muted); font-family: var(--font-mono); font-size: 12px; }

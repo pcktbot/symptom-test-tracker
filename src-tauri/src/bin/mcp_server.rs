@@ -77,6 +77,10 @@ pub struct InsertLabSessionParam {
     pub notes: Option<String>,
     #[schemars(description = "Array of individual lab result entries")]
     pub results: Vec<LabResultInput>,
+    #[schemars(description = "If provided, append results to this existing session instead of creating a new one. \
+        Use get_recent_labs to find the session_id for a given date. \
+        When appending, test_date, lab_name, and notes are ignored.")]
+    pub session_id: Option<i64>,
 }
 
 #[derive(Debug, Deserialize, schemars::JsonSchema)]
@@ -379,7 +383,10 @@ impl TrackerMcp {
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
-    #[tool(description = "Insert a new lab session with results. Use this to save lab results parsed from a lab report. \
+    #[tool(description = "Insert a new lab session with results, or append results to an existing session. \
+        Use this to save lab results parsed from a lab report. \
+        To append to an existing session (e.g. adding LA panel results to a session that already has CBC), \
+        pass the session_id from get_recent_labs — no new session will be created. \
         Each result needs at minimum a test_name and either a numeric value or text_value. \
         Set the flag to 'H' (high), 'L' (low), or 'A' (abnormal) if the result is outside the reference range, \
         or 'N' for normal. Results where both value and text_value are empty will be skipped. \
@@ -398,16 +405,33 @@ impl TrackerMcp {
         conn.execute_batch("PRAGMA foreign_keys=ON;")
             .map_err(|e| McpError::internal_error(e.to_string(), None))?;
 
-        conn.execute(
-            "INSERT INTO lab_sessions (test_date, lab_name, notes) VALUES (?1, ?2, ?3)",
-            rusqlite::params![
-                params.test_date,
-                params.lab_name.unwrap_or_default(),
-                params.notes.unwrap_or_default(),
-            ],
-        ).map_err(|e| McpError::internal_error(format!("Failed to insert lab session: {}", e), None))?;
+        // If session_id provided, append to existing session; otherwise create a new one.
+        let session_id = if let Some(sid) = params.session_id {
+            // Verify the session actually exists
+            let exists: bool = conn.query_row(
+                "SELECT COUNT(*) FROM lab_sessions WHERE id = ?1",
+                rusqlite::params![sid],
+                |row| row.get::<_, i64>(0),
+            ).map_err(|e| McpError::internal_error(e.to_string(), None))? > 0;
+            if !exists {
+                return Err(McpError::internal_error(
+                    format!("Session {} not found. Use get_recent_labs to find valid session IDs.", sid),
+                    None,
+                ));
+            }
+            sid
+        } else {
+            conn.execute(
+                "INSERT INTO lab_sessions (test_date, lab_name, notes) VALUES (?1, ?2, ?3)",
+                rusqlite::params![
+                    params.test_date,
+                    params.lab_name.unwrap_or_default(),
+                    params.notes.unwrap_or_default(),
+                ],
+            ).map_err(|e| McpError::internal_error(format!("Failed to insert lab session: {}", e), None))?;
+            conn.last_insert_rowid()
+        };
 
-        let session_id = conn.last_insert_rowid();
         let mut inserted = 0u32;
 
         for r in &params.results {

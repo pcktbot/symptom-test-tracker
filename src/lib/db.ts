@@ -35,6 +35,10 @@ export async function deleteLabSession(id: number): Promise<void> {
   return invoke('delete_lab_session', { id });
 }
 
+export async function mergeLabSessions(targetId: number, sourceId: number): Promise<void> {
+  return invoke('merge_lab_sessions', { targetId, sourceId });
+}
+
 export async function getLatestAbnormal(): Promise<LabResult[]> {
   return invoke('get_latest_abnormal');
 }

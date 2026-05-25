@@ -93,6 +93,10 @@ export const LAB_PANELS: PanelDefinition[] = [
       { name: 'Anticardiolipin IgM', unit: 'MPL', ref_low: null, ref_high: 20 },
       { name: 'Beta-2 Glycoprotein I IgG', unit: 'SGU', ref_low: null, ref_high: 20 },
       { name: 'Beta-2 Glycoprotein I IgM', unit: 'SMU', ref_low: null, ref_high: 20 },
+      { name: 'Cardiolipin IgG Ab', unit: 'CU', ref_low: null, ref_high: 20 },
+      { name: 'Cardiolipin IgM Ab', unit: 'CU', ref_low: null, ref_high: 20 },
+      { name: 'Beta-2 Glycoprotein IgG Ab', unit: 'CU', ref_low: null, ref_high: 20 },
+      { name: 'Beta-2 Glycoprotein IgM Ab', unit: 'CU', ref_low: null, ref_high: 20 },
       { name: 'Lupus Anticoagulant', unit: '', ref_low: null, ref_high: null, text_only: true },
       { name: 'Direct Coombs', unit: '', ref_low: null, ref_high: null, text_only: true },
       { name: 'Urine Protein/Creatinine', unit: 'mg/g', ref_low: null, ref_high: 200 },
@@ -133,6 +137,17 @@ export const LAB_PANELS: PanelDefinition[] = [
       { name: 'PT', unit: 'seconds', ref_low: 11, ref_high: 13.5 },
       { name: 'INR', unit: '', ref_low: 0.8, ref_high: 1.2 },
       { name: 'aPTT', unit: 'seconds', ref_low: 25, ref_high: 35 },
+    ],
+  },
+  {
+    name: 'Lupus Anticoagulant (LA)',
+    tests: [
+      { name: 'Lupus PTT Screen', unit: 'seconds', ref_low: 25.4, ref_high: 36.9 },
+      { name: 'ACT PTT', unit: 'seconds', ref_low: 25.1, ref_high: 36.5 },
+      { name: 'DRVVT Screen', unit: 'ratio', ref_low: null, ref_high: 1.2 },
+      { name: 'DRVVT Screen 1:1 Mix', unit: 'ratio', ref_low: null, ref_high: 1.2 },
+      { name: 'DRVVT Confirm', unit: 'ratio', ref_low: null, ref_high: 1.2 },
+      { name: 'DRVVT Ratio', unit: 'ratio', ref_low: null, ref_high: 1.2 },
     ],
   },
 ];

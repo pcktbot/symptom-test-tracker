@@ -4,6 +4,8 @@
   import { LAB_PANELS } from '$lib/utils';
   import type { CustomLabTest } from '$lib/types';
 
+  let { onClose }: { onClose: () => void } = $props();
+
   let customTests: CustomLabTest[] = $state([]);
   let loading = $state(true);
   let saving = $state(false);
@@ -102,7 +104,10 @@
 </script>
 
 <div class="lab-manage">
-  <h1>Manage Lab Tests</h1>
+  <div class="panel-header">
+    <h2>Configure Labs</h2>
+    <button class="close-btn" onclick={onClose} aria-label="Close">&times;</button>
+  </div>
   <p class="subtitle">Built-in tests are read-only. Add custom tests to any panel below.</p>
 
   <div class="form-section">
@@ -225,7 +230,38 @@
 <style>
   .lab-manage { max-width: 900px; }
 
-  h1 { margin-bottom: 4px; }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .panel-header h2 {
+    margin: 0;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+  }
+
+  .close-btn:hover {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+  }
 
   .subtitle {
     color: var(--color-text-muted);

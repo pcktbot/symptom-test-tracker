@@ -77,6 +77,10 @@
   --shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
+body[data-font-size="sm"] { zoom: 0.9; }
+body[data-font-size="md"] { zoom: 1; }
+body[data-font-size="lg"] { zoom: 1.15; }
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

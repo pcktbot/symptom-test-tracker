@@ -4,6 +4,8 @@
   import { save } from '@tauri-apps/plugin-dialog';
   import { writeTextFile } from '@tauri-apps/plugin-fs';
 
+  let { onClose }: { onClose: () => void } = $props();
+
   const oneYearAgo = (() => {
     const d = new Date();
     d.setFullYear(d.getFullYear() - 1);
@@ -44,7 +46,10 @@
 </script>
 
 <div class="export-view">
-  <h1>Export Data</h1>
+  <div class="panel-header">
+    <h2>Export Data</h2>
+    <button class="close-btn" onclick={onClose} aria-label="Close">&times;</button>
+  </div>
 
   <div class="form">
     <div class="form-row">
@@ -93,7 +98,38 @@
 <style>
   .export-view { max-width: 500px; }
 
-  h1 { margin-bottom: 20px; }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .panel-header h2 {
+    margin: 0;
+  }
+
+  .close-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0;
+  }
+
+  .close-btn:hover {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+  }
 
   .form {
     display: flex;

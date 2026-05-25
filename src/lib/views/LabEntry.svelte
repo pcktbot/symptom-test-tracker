@@ -13,6 +13,8 @@
   let saving = $state(false);
   let expandedPanels: Record<string, boolean> = $state({});
   let panels: PanelDefinition[] = $state([]);
+  // Results from DB whose test_name isn't in any panel — preserved verbatim on save
+  let passthroughResults: LabResult[] = $state([]);
 
   // Store result values keyed by test name
   let resultValues: Record<string, {
@@ -60,6 +62,10 @@
             resultValues[r.test_name].flag = r.flag;
             resultValues[r.test_name].ref_low = r.ref_range_low != null ? String(r.ref_range_low) : '';
             resultValues[r.test_name].ref_high = r.ref_range_high != null ? String(r.ref_range_high) : '';
+          } else {
+            // Test came from MCP or another source — not in any panel definition.
+            // Preserve it so editing this session doesn't destroy the data.
+            passthroughResults.push(r);
           }
           // Expand panels that have data
           if (r.panel) expandedPanels[r.panel] = true;
@@ -122,7 +128,7 @@
         });
       }
 
-      await saveLabSession(session, results);
+      await saveLabSession(session, [...results, ...passthroughResults]);
       onNavigate('lab-results');
     } catch (e) {
       console.error('Failed to save:', e);
@@ -158,6 +164,34 @@
       <input id="session-notes" type="text" bind:value={notes} placeholder="Optional notes" />
     </div>
   </div>
+
+  {#if passthroughResults.length > 0}
+    <div class="passthrough-section">
+      <h3 class="passthrough-title">Additional Results (from MCP / import)</h3>
+      <table class="passthrough-table">
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Panel</th>
+            <th>Value</th>
+            <th>Unit</th>
+            <th>Flag</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each passthroughResults as r}
+            <tr>
+              <td class="test-name">{r.test_name}</td>
+              <td class="muted">{r.panel || '—'}</td>
+              <td class="mono">{r.value ?? r.text_value}</td>
+              <td class="muted">{r.unit}</td>
+              <td><span class="badge flag-{r.flag.toLowerCase()}">{r.flag}</span></td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  {/if}
 
   <div class="panels">
     {#each panels as panel}
@@ -280,6 +314,48 @@
   .field input {
     min-width: 160px;
   }
+
+  .passthrough-section {
+    margin-bottom: 20px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .passthrough-title {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    margin: 0;
+    background: var(--color-surface-raised);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .passthrough-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .passthrough-table th {
+    text-align: left;
+    padding: 4px 10px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .passthrough-table td {
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .muted { color: var(--color-text-muted); }
+  .mono { font-family: var(--font-mono); }
 
   .panels {
     display: flex;

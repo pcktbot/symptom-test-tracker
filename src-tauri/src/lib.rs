@@ -20,6 +20,7 @@ pub fn run() {
             commands::labs::get_lab_session,
             commands::labs::save_lab_session,
             commands::labs::delete_lab_session,
+            commands::labs::merge_lab_sessions,
             commands::labs::get_latest_abnormal,
             commands::labs::get_latest_abnormal_with_previous,
             commands::labs::get_trends,

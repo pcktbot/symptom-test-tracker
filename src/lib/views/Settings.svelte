@@ -2,7 +2,12 @@
   import { onMount } from 'svelte';
   import { getSetting, setSetting } from '$lib/db';
 
-  let { onClose }: { onClose: () => void } = $props();
+  type FontSize = 'sm' | 'md' | 'lg';
+  let { onClose, fontSize = 'md', onFontSizeChange }: {
+    onClose: () => void;
+    fontSize?: FontSize;
+    onFontSizeChange?: (size: FontSize) => void;
+  } = $props();
 
   let mcpEnabled = $state(true);
   let mcpWriteEnabled = $state(false);
@@ -54,6 +59,25 @@
   </div>
 
   <div class="settings-body">
+    <section class="section">
+      <h3>Appearance</h3>
+      <div class="field-label" style="margin-bottom: 8px;">Text size</div>
+      <div class="font-size-options">
+        {#each (['sm', 'md', 'lg'] as const) as size}
+          <button
+            class="font-size-btn"
+            class:active={fontSize === size}
+            onclick={() => onFontSizeChange?.(size)}
+          >
+            {size === 'sm' ? 'Small' : size === 'md' ? 'Medium' : 'Large'}
+          </button>
+        {/each}
+      </div>
+      <span class="toggle-subtitle" style="margin-top: 6px; display: block;">
+        Also: ⌘= / ⌘- to resize, ⌘0 to reset
+      </span>
+    </section>
+
     <section class="section">
       <h3>AI Assistant</h3>
       <div class="toggle-row">
@@ -438,5 +462,43 @@
 
   .btn-sm {
     padding: 6px 12px;
+  }
+
+  .font-size-options {
+    display: flex;
+    gap: 0;
+  }
+
+  .font-size-btn {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 13px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .font-size-btn:first-child {
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+
+  .font-size-btn:last-child {
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-left: -1px;
+  }
+
+  .font-size-btn:not(:first-child):not(:last-child) {
+    border-radius: 0;
+    margin-left: -1px;
+  }
+
+  .font-size-btn.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+    z-index: 1;
+    position: relative;
   }
 </style>
