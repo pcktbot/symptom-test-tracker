@@ -124,6 +124,9 @@
     padding: 20px;
     max-width: 1100px;
     margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
   .view-header {
     display: flex;
@@ -190,14 +193,18 @@
   .layout {
     display: flex;
     gap: 24px;
-    align-items: flex-start;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
   }
   .left-col {
     flex: 0 0 auto;
+    overflow-y: auto;
   }
   .right-col {
     flex: 1;
     min-width: 180px;
+    overflow-y: auto;
     padding-top: 36px; /* align with grid body (below month headers) */
   }
   .no-selection {
