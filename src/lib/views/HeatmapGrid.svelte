@@ -81,7 +81,7 @@
     padding: 0 2px 4px;
     text-align: center;
     font-size: 0.75rem;
-    color: var(--text-muted, #888);
+    color: var(--color-text-muted, #6b7280);
     white-space: nowrap;
   }
   .month-header span {
@@ -94,7 +94,7 @@
     padding: 1px 6px 1px 0;
     text-align: right;
     font-size: 0.75rem;
-    color: var(--text-muted, #888);
+    color: var(--color-text-muted, #6b7280);
     width: 28px;
   }
   .cell {
@@ -106,16 +106,17 @@
     display: block;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--border, #333);
+    border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 3px;
-    background: var(--cell-empty, #2a2a2a);
+    background: var(--color-surface-raised, #f3f4f6);
     cursor: pointer;
     padding: 0;
     transition: opacity 0.1s, transform 0.1s;
   }
   .cell button:hover {
-    opacity: 0.85;
+    opacity: 0.8;
     transform: scale(1.1);
+    border-color: var(--color-border-strong, #d1d5db);
   }
   .cell.invalid button {
     display: none;
@@ -124,11 +125,11 @@
     background: transparent;
   }
   .cell.today button {
-    outline: 2px solid var(--accent, #6c63ff);
+    outline: 2px solid var(--color-accent, #2E6171);
     outline-offset: 1px;
   }
   .cell.selected button {
-    outline: 2px solid white;
+    outline: 2px solid var(--color-text, #1a1a1a);
     outline-offset: 1px;
   }
 </style>

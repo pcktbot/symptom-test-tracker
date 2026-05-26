@@ -71,7 +71,7 @@
 <div class="config-aside">
   <div class="config-header">
     <h3>Scale Settings</h3>
-    <button class="done-btn" onclick={handleDone}>Done</button>
+    <button class="done-btn primary" onclick={handleDone}>Done</button>
   </div>
 
   {#if stepsChanged}
@@ -121,14 +121,15 @@
     right: 0;
     height: 100%;
     width: 280px;
-    background: var(--surface-raised, #222);
-    border-left: 1px solid var(--border, #444);
+    background: var(--color-surface, #ffffff);
+    border-left: 1px solid var(--color-border, #e5e7eb);
     padding: 20px 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     z-index: 200;
     overflow-y: auto;
+    box-shadow: -2px 0 8px rgba(0,0,0,0.06);
   }
   .config-header {
     display: flex;
@@ -138,26 +139,22 @@
   .config-header h3 {
     margin: 0;
     font-size: 1rem;
+    color: var(--color-text, #1a1a1a);
   }
   .done-btn {
     padding: 4px 14px;
-    border-radius: 6px;
-    background: var(--accent, #6c63ff);
-    color: white;
-    border: none;
-    cursor: pointer;
     font-size: 0.85rem;
   }
   .remap-warning {
     font-size: 0.8rem;
-    color: var(--warning, #f1c40f);
-    background: rgba(241,196,15,0.1);
+    color: var(--color-warning, #F4B942);
+    background: rgba(244,185,66,0.1);
     border-radius: 6px;
     padding: 8px;
     margin: 0;
   }
   .error {
-    color: var(--error, #e74c3c);
+    color: var(--color-danger, #7B0828);
     font-size: 0.8rem;
   }
   .step-count-row {
@@ -165,6 +162,7 @@
     align-items: center;
     justify-content: space-between;
     font-size: 0.9rem;
+    color: var(--color-text, #1a1a1a);
   }
   .step-controls {
     display: flex;
@@ -175,20 +173,19 @@
     width: 28px;
     height: 28px;
     border-radius: 4px;
-    border: 1px solid var(--border, #444);
-    background: var(--surface, #1e1e1e);
-    color: var(--text, #e0e0e0);
-    cursor: pointer;
+    padding: 0;
     font-size: 1rem;
+    line-height: 1;
   }
   .step-controls button:disabled {
-    opacity: 0.3;
+    opacity: 0.35;
     cursor: default;
   }
   .step-number {
     font-weight: 600;
     min-width: 20px;
     text-align: center;
+    color: var(--color-text, #1a1a1a);
   }
   .step-list {
     display: flex;
@@ -205,17 +202,18 @@
     height: 36px;
     padding: 2px;
     border-radius: 4px;
-    border: 1px solid var(--border, #444);
+    border: 1px solid var(--color-border, #e5e7eb);
     background: none;
     cursor: pointer;
+    flex-shrink: 0;
   }
   .label-input {
     flex: 1;
     padding: 6px 8px;
     border-radius: 4px;
-    border: 1px solid var(--border, #444);
-    background: var(--surface, #1e1e1e);
-    color: var(--text, #e0e0e0);
+    border: 1px solid var(--color-border, #e5e7eb);
+    background: var(--color-surface, #ffffff);
+    color: var(--color-text, #1a1a1a);
     font-size: 0.85rem;
   }
 </style>

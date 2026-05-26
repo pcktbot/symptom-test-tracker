@@ -84,9 +84,9 @@
     align-items: center;
     min-height: 36px;
     padding: 4px 8px;
-    border: 1px solid var(--border, #444);
+    border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 6px;
-    background: var(--surface, #1e1e1e);
+    background: var(--color-surface, #ffffff);
     cursor: text;
   }
   .tag {
@@ -95,8 +95,8 @@
     gap: 4px;
     padding: 2px 8px;
     border-radius: 12px;
-    background: var(--accent, #3a3a5c);
-    color: var(--text, #e0e0e0);
+    background: var(--color-accent, #2E6171);
+    color: #ffffff;
     font-size: 0.8rem;
   }
   .tag-remove {
@@ -106,7 +106,7 @@
     color: inherit;
     padding: 0;
     line-height: 1;
-    opacity: 0.6;
+    opacity: 0.7;
   }
   .tag-remove:hover { opacity: 1; }
   .tag-text-input {
@@ -115,7 +115,7 @@
     background: none;
     border: none;
     outline: none;
-    color: var(--text, #e0e0e0);
+    color: var(--color-text, #1a1a1a);
     font-size: 0.9rem;
   }
   .suggestions {
@@ -126,9 +126,10 @@
     margin: 2px 0 0;
     padding: 4px 0;
     list-style: none;
-    background: var(--surface-raised, #2a2a2a);
-    border: 1px solid var(--border, #444);
+    background: var(--color-surface, #ffffff);
+    border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 6px;
+    box-shadow: var(--shadow, 0 1px 4px rgba(0,0,0,0.08));
     z-index: 100;
     max-height: 200px;
     overflow-y: auto;
@@ -140,10 +141,10 @@
     border: none;
     padding: 6px 12px;
     cursor: pointer;
-    color: var(--text, #e0e0e0);
+    color: var(--color-text, #1a1a1a);
     font-size: 0.9rem;
   }
   .suggestions li button:hover {
-    background: var(--hover, #333);
+    background: var(--color-surface-raised, #f9fafb);
   }
 </style>

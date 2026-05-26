@@ -94,18 +94,25 @@
     <p class="error-msg">{error}</p>
   {/if}
 
-  <HeatmapGrid {ratings} {config} {selectedDate} {year} onselect={handleSelect} />
-
-  {#if selectedDate}
-    <DayEntryPanel
-      date={selectedDate}
-      existing={selectedRating}
-      {config}
-      {allTags}
-      onsave={handleSave}
-      onclose={() => (selectedDate = null)}
-    />
-  {/if}
+  <div class="layout">
+    <div class="left-col">
+      <HeatmapGrid {ratings} {config} {selectedDate} {year} onselect={handleSelect} />
+    </div>
+    <div class="right-col">
+      {#if selectedDate}
+        <DayEntryPanel
+          date={selectedDate}
+          existing={selectedRating}
+          {config}
+          {allTags}
+          onsave={handleSave}
+          onclose={() => (selectedDate = null)}
+        />
+      {:else}
+        <p class="no-selection">Select a day to log a rating.</p>
+      {/if}
+    </div>
+  </div>
 
   {#if configOpen}
     <HeatmapConfig onclose={() => (configOpen = false)} onupdate={handleConfigUpdate} />
@@ -115,7 +122,7 @@
 <style>
   .daily-rating-view {
     padding: 20px;
-    max-width: 960px;
+    max-width: 1100px;
     margin: 0 auto;
   }
   .view-header {
@@ -131,19 +138,25 @@
   }
   .year-nav button {
     background: none;
-    border: 1px solid var(--border, #444);
+    border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 4px;
-    color: var(--text, #e0e0e0);
+    color: var(--color-text, #1a1a1a);
     width: 28px;
     height: 28px;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+  .year-nav button:hover {
+    background: var(--color-surface-raised, #f9fafb);
+    border-color: var(--color-border-strong, #d1d5db);
   }
   .year-nav button:disabled {
-    opacity: 0.3;
+    opacity: 0.35;
     cursor: default;
   }
   .year-label {
@@ -151,24 +164,44 @@
     font-weight: 600;
     min-width: 52px;
     text-align: center;
+    color: var(--color-text, #1a1a1a);
   }
   .config-toggle {
     background: none;
-    border: 1px solid var(--border, #444);
+    border: 1px solid var(--color-border, #e5e7eb);
     border-radius: 6px;
-    color: var(--text-muted, #888);
+    color: var(--color-text-muted, #6b7280);
     width: 32px;
     height: 32px;
     cursor: pointer;
     font-size: 1rem;
+    padding: 0;
   }
   .config-toggle:hover, .config-toggle.active {
-    color: var(--text, #e0e0e0);
-    border-color: var(--text-muted, #888);
+    color: var(--color-text, #1a1a1a);
+    border-color: var(--color-border-strong, #d1d5db);
+    background: var(--color-surface-raised, #f9fafb);
   }
   .error-msg {
-    color: var(--error, #e74c3c);
+    color: var(--color-danger, #7B0828);
     font-size: 0.85rem;
     margin: 0 0 12px;
+  }
+  .layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .left-col {
+    flex: 0 0 auto;
+  }
+  .right-col {
+    flex: 1;
+    min-width: 180px;
+    padding-top: 36px; /* align with grid body (below month headers) */
+  }
+  .no-selection {
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6b7280);
   }
 </style>

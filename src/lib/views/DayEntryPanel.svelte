@@ -46,7 +46,7 @@
     <span class="entry-date">{formatDate(date)}</span>
     <button class="close-btn" onclick={onclose} title="Close">×</button>
   </div>
-  <div class="score-row">
+  <div class="score-col">
     {#each steps as step}
       <button
         class="score-btn"
@@ -64,14 +64,9 @@
 
 <style>
   .entry-panel {
-    margin-top: 16px;
-    padding: 16px;
-    border: 1px solid var(--border, #444);
-    border-radius: 8px;
-    background: var(--surface, #1e1e1e);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
   .entry-header {
     display: flex;
@@ -79,40 +74,40 @@
     align-items: center;
   }
   .entry-date {
-    font-size: 0.9rem;
-    color: var(--text-muted, #aaa);
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6b7280);
   }
   .close-btn {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--text-muted, #888);
+    color: var(--color-text-muted, #6b7280);
     font-size: 1.2rem;
     line-height: 1;
     padding: 0 4px;
   }
-  .close-btn:hover { color: var(--text, #e0e0e0); }
-  .score-row {
+  .close-btn:hover { color: var(--color-text, #1a1a1a); }
+  .score-col {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 6px;
   }
   .score-btn {
-    flex: 1;
-    min-width: 60px;
-    padding: 8px 4px;
+    width: 100%;
+    padding: 8px 12px;
     border: 2px solid transparent;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 500;
     color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    text-align: left;
     transition: transform 0.1s, border-color 0.1s;
   }
-  .score-btn:hover { transform: scale(1.04); }
+  .score-btn:hover { transform: scale(1.02); }
   .score-btn.selected {
-    border-color: white;
-    transform: scale(1.06);
+    border-color: var(--color-text, #1a1a1a);
+    transform: scale(1.02);
   }
 </style>
