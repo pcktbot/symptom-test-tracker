@@ -69,6 +69,10 @@
 
   const COLORS = ['#2563eb', '#dc2626', '#16a34a', '#d97706', '#7c3aed', '#0891b2', '#be123c', '#4f46e5'];
 
+  function cssVar(name: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
   async function loadLabChart() {
     if (selectedTests.length === 0) {
       if (chart) { chart.destroy(); chart = null; }
@@ -110,8 +114,8 @@
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           scales: {
-            x: { grid: { color: '#e5e7eb' } },
-            y: { grid: { color: '#e5e7eb' }, beginAtZero: false },
+            x: { grid: { color: cssVar('--border') } },
+            y: { grid: { color: cssVar('--border') }, beginAtZero: false },
           },
           plugins: {
             legend: { position: 'top' },
@@ -138,8 +142,8 @@
       datasets.push({
         label: 'Wellness Score',
         data: wellness.map(p => ({ x: p.date, y: p.wellness_score })),
-        borderColor: '#2563eb',
-        backgroundColor: '#2563eb20',
+        borderColor: cssVar('--primary'),
+        backgroundColor: cssVar('--primary') + '20',
         tension: 0.3,
         pointRadius: 4,
         pointHoverRadius: 6,
@@ -179,14 +183,14 @@
           maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           scales: {
-            x: { grid: { color: '#e5e7eb' } },
+            x: { grid: { color: cssVar('--border') } },
             y: {
               type: 'linear',
               position: 'left',
               min: 1,
               max: 5,
               title: { display: true, text: 'Wellness (1-5)' },
-              grid: { color: '#e5e7eb' },
+              grid: { color: cssVar('--border') },
               ticks: { stepSize: 1 },
             },
             y1: {
@@ -326,7 +330,9 @@
     {:else if mode === 'labs' && selectedTests.length === 0}
       <p class="muted">Select one or more tests to view trends.</p>
     {/if}
-    <canvas bind:this={chartCanvas}></canvas>
+    <div class="trend-card">
+      <canvas bind:this={chartCanvas}></canvas>
+    </div>
   </div>
 </div>
 
@@ -392,7 +398,7 @@
 
   .mode-btn.active {
     background: var(--color-accent);
-    color: white;
+    color: var(--primary-contrast, #fff);
     border-color: var(--color-accent);
     z-index: 1;
     position: relative;
@@ -483,7 +489,18 @@
     position: relative;
   }
 
-  .chart-container canvas {
+  .trend-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+  }
+
+  .trend-card canvas {
     width: 100% !important;
     height: 100% !important;
   }
