@@ -121,9 +121,9 @@
 body { background: var(--bg); }
 h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 
-body[data-font-size="sm"] { zoom: 0.9; }
-body[data-font-size="md"] { zoom: 1; }
-body[data-font-size="lg"] { zoom: 1.15; }
+body[data-font-size="sm"] { zoom: 0.85; }
+body[data-font-size="md"] { zoom: 0.92; }
+body[data-font-size="lg"] { zoom: 1.05; }
 
 *, *::before, *::after {
   box-sizing: border-box;

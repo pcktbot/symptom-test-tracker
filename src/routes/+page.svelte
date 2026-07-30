@@ -333,12 +333,12 @@
   }
 
   .pill {
-    padding: 8px 18px;
+    padding: 6px 14px;
     border-radius: 999px;
     border: 1px solid transparent;
     background: transparent;
     color: var(--text);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
@@ -362,8 +362,9 @@
   }
 
   .log-today {
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 8px;
+    font-size: 13px;
     font-weight: 600;
   }
 
