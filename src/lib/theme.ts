@@ -86,3 +86,32 @@ export function resolveTheme(setting: ThemeSetting): TokenMap {
   const preset = PRESETS.find((p) => p.id === setting.preset) ?? PRESETS[0];
   return { ...preset.tokens, ...(setting.overrides as TokenMap) };
 }
+
+export function applyTheme(el: HTMLElement, setting: ThemeSetting): void {
+  const tokens = resolveTheme(setting);
+  for (const key of TOKEN_KEYS) {
+    el.style.setProperty(key, tokens[key]);
+  }
+}
+
+const DEFAULT_SETTING: ThemeSetting = { preset: DEFAULT_PRESET_ID, overrides: {} };
+
+export function parseThemeSetting(raw: string): ThemeSetting {
+  if (!raw) return { ...DEFAULT_SETTING };
+  try {
+    const parsed = JSON.parse(raw) as Partial<ThemeSetting>;
+    const preset = typeof parsed.preset === 'string' ? parsed.preset : DEFAULT_PRESET_ID;
+    const rawOverrides = (parsed.overrides ?? {}) as Record<string, string>;
+    const overrides: Partial<TokenMap> = {};
+    for (const key of TOKEN_KEYS) {
+      if (typeof rawOverrides[key] === 'string') overrides[key] = rawOverrides[key];
+    }
+    return { preset, overrides };
+  } catch {
+    return { ...DEFAULT_SETTING };
+  }
+}
+
+export function serializeThemeSetting(setting: ThemeSetting): string {
+  return JSON.stringify(setting);
+}
