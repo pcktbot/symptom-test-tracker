@@ -101,7 +101,7 @@
   <DiagnosisAccordion {onNavigate} />
 
   <div class="view-header">
-    <h1>Artifacts</h1>
+    <h1>Documents</h1>
     <div class="header-actions">
       <button class="btn-primary" onclick={() => showAdd = true}>+ Add</button>
     </div>
@@ -178,7 +178,10 @@
   {/if}
 
   {#if artifacts.length === 0 && !showAdd}
-    <p class="empty">No artifacts yet. Add an after-visit summary or lab report to get started.</p>
+    <div class="empty-state">
+      <div class="empty-title">No documents yet</div>
+      <div class="empty-body">Paste text or upload a file to save it here.</div>
+    </div>
   {/if}
 
   <div class="artifact-list">
@@ -241,7 +244,13 @@
   .flag-h, .flag-hh { color: #e05555; }
   .flag-l, .flag-ll { color: #e09055; }
   .more-results { font-size: 11px; color: var(--color-text-muted); text-align: center; padding: 4px; }
-  .empty { color: var(--color-text-muted); font-size: 14px; }
+  .empty-state {
+    padding: 40px 20px; text-align: center;
+    border: 1px dashed var(--border, var(--color-border)); border-radius: 12px;
+    background: var(--surface, var(--color-surface-raised));
+  }
+  .empty-title { font-family: var(--font-heading); font-weight: 700; font-size: 18px; }
+  .empty-body { color: var(--text-muted, var(--color-text-muted)); margin-top: 6px; }
   .artifact-list { display: flex; flex-direction: column; gap: 6px; }
   .artifact-row { display: flex; align-items: center; justify-content: space-between; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 6px; padding: 10px 14px; }
   .artifact-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
