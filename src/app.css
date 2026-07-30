@@ -55,27 +55,47 @@
 }
 
 :root {
-  --color-text: #1a1a1a;
-  --color-text-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-border-strong: #d1d5db;
-  --color-surface: #ffffff;
-  --color-surface-raised: #f9fafb;
-  --color-accent: #2E6171;
-  --color-accent-hover: #173038;
-  --color-flag-high: #F4B942;
-  --color-flag-low: #2563eb;
-  --color-flag-critical: #7B0828;
-  --color-flag-normal: #7FB069;
-  --color-success: #7FB069;
-  --color-warning: #F4B942;
-  --color-danger: #7B0828;
+  /* Baseline Warm preset — overridden at runtime by theme setting */
+  --bg: #f5f0e8;
+  --surface: #fbfaf6;
+  --border: #e6ded0;
+  --text: #1a1a1a;
+  --text-muted: #7a7368;
+  --primary: #1f3a3a;
+  --primary-contrast: #ffffff;
+  --accent-high: #b8763a;
+  --accent-low: #3a5878;
+  --accent-good: #5a7a3a;
+  --accent-bad: #8a2f2f;
+
+  /* Legacy aliases — retained until per-view restyles land */
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--bg);
+  --color-accent: var(--primary);
+  --color-accent-hover: var(--primary);
+  --color-flag-high: var(--accent-high);
+  --color-flag-low: var(--accent-low);
+  --color-flag-critical: var(--accent-bad);
+  --color-flag-normal: var(--accent-good);
+  --color-success: var(--accent-good);
+  --color-warning: var(--accent-high);
+  --color-danger: var(--accent-bad);
+
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-heading: 'Lato', 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --radius: 6px;
+  --radius-lg: 12px;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
   --shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
+
+body { background: var(--bg); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 
 body[data-font-size="sm"] { zoom: 0.9; }
 body[data-font-size="md"] { zoom: 1; }

@@ -15,6 +15,7 @@
   import LabManage from '$lib/views/LabManage.svelte';
   import Export from '$lib/views/Export.svelte';
   import { getSetting, setSetting } from '$lib/db';
+  import { applyTheme, parseThemeSetting } from '$lib/theme';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { LogicalSize, LogicalPosition } from '@tauri-apps/api/dpi';
 
@@ -116,6 +117,13 @@
       if (!isNaN(parsed)) chatWidth = Math.max(CHAT_MIN_WIDTH, Math.min(CHAT_MAX_WIDTH, parsed));
       if (fontSizeVal === 'sm' || fontSizeVal === 'md' || fontSizeVal === 'lg') fontSize = fontSizeVal;
       document.body.dataset.fontSize = fontSize;
+    });
+  });
+
+  $effect(() => {
+    getSetting('theme').then((raw) => {
+      const setting = parseThemeSetting(raw);
+      applyTheme(document.documentElement, setting);
     });
   });
 

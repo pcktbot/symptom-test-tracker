@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { PRESETS, DEFAULT_PRESET_ID, resolveTheme, TOKEN_KEYS, ThemeSetting, applyTheme, parseThemeSetting, serializeThemeSetting } from './theme';
+import { PRESETS, DEFAULT_PRESET_ID, resolveTheme, TOKEN_KEYS, applyTheme, parseThemeSetting, serializeThemeSetting } from './theme';
+import type { ThemeSetting } from './theme';
 
 describe('theme presets', () => {
   it('exposes the expected preset ids', () => {
