@@ -219,10 +219,10 @@
     {
       label: 'Data',
       items: [
-        { view: 'artifacts', label: 'Artifacts' },
+        { view: 'documents', label: 'Documents' },
       ],
     },
-    { label: 'Profile', items: [{ view: 'diagnoses', label: 'Diagnoses' }] },
+    { label: 'Profile', items: [{ view: 'care-team', label: 'Care Team' }] },
   ];
 </script>
 
@@ -287,9 +287,9 @@
         <Trends {openGlossary} onNavigate={navigate} openLabConfig={() => activePanel = 'labConfig'} />
       {:else if currentView === 'daily-rating'}
         <DailyRating />
-      {:else if currentView === 'artifacts'}
+      {:else if currentView === 'documents'}
         <Artifacts onNavigate={navigate} openExport={() => activePanel = 'export'} />
-      {:else if currentView === 'diagnoses'}
+      {:else if currentView === 'care-team'}
         <Diagnoses />
       {/if}
     </main>
