@@ -5,3 +5,4 @@ pub mod settings;
 pub mod diagnoses;
 pub mod artifacts;
 pub mod chat;
+pub mod daily_rating;

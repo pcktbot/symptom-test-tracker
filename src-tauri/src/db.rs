@@ -128,6 +128,19 @@ impl Database {
             "
         )?;
 
+        // Additive migration: tags column for daily_summaries
+        conn.execute(
+            "ALTER TABLE daily_summaries ADD COLUMN tags TEXT NOT NULL DEFAULT ''",
+            [],
+        )
+        .or_else(|e| {
+            if e.to_string().contains("duplicate column name") {
+                Ok(0)
+            } else {
+                Err(e)
+            }
+        })?;
+
         // Seed default symptoms if table is empty
         let count: i64 = conn.query_row("SELECT COUNT(*) FROM symptoms", [], |r| r.get(0))?;
         if count == 0 {
