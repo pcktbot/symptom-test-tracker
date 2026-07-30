@@ -49,9 +49,9 @@
   <div class="score-col">
     {#each steps as step}
       <button
-        class="score-btn"
+        class="score-bar"
         class:selected={existing?.wellness_score === step}
-        style="background-color: {scoreToColor(step, config)}"
+        style="background: {scoreToColor(step, config)}"
         onclick={() => selectScore(step)}
         title={scoreToLabel(step, config)}
       >
@@ -75,39 +75,35 @@
   }
   .entry-date {
     font-size: 0.85rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--text-muted);
   }
   .close-btn {
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--text-muted);
     font-size: 1.2rem;
     line-height: 1;
     padding: 0 4px;
   }
-  .close-btn:hover { color: var(--color-text, #1a1a1a); }
+  .close-btn:hover { color: var(--text); }
   .score-col {
     display: flex;
     flex-direction: column;
-    gap: 6px;
   }
-  .score-btn {
+  .score-bar {
+    display: block;
     width: 100%;
-    padding: 8px 12px;
+    padding: 12px 14px;
     border: 2px solid transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 500;
+    border-radius: 8px;
     color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    font-weight: 600;
     text-align: left;
-    transition: transform 0.1s, border-color 0.1s;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
   }
-  .score-btn:hover { transform: scale(1.02); }
-  .score-btn.selected {
-    border-color: var(--color-text, #1a1a1a);
-    transform: scale(1.02);
-  }
+  .score-bar.selected { border-color: var(--primary); }
 </style>
