@@ -1,283 +1,271 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { getLatestAbnormalWithPrevious } from '$lib/db';
-  import { flagClass, formatDate } from '$lib/utils';
-  import type { AbnormalResult, View } from '$lib/types';
-  import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
+  import type { View, Diagnosis, DailyRating, AbnormalResult } from '$lib/types';
+  import {
+    getDiagnoses,
+    getDailyRatings,
+    getLatestAbnormalWithPrevious,
+    getHeatmapConfig,
+  } from '$lib/db';
+  import { upcomingCare } from '$lib/demo';
 
-  let { onNavigate, openGlossary }: { onNavigate: (view: View, sessionId?: number | null) => void; openGlossary: (testName?: string) => void } = $props();
+  let { onNavigate }: {
+    onNavigate: (view: View) => void;
+    openGlossary?: (test?: string) => void;
+  } = $props();
 
+  let diagnoses: Diagnosis[] = $state([]);
+  let ratings: DailyRating[] = $state([]);
   let abnormals: AbnormalResult[] = $state([]);
-  let loading = $state(true);
-  let fontSize = $state(13);
-  const FONT_MIN = 11;
-  const FONT_MAX = 18;
+  let heatmapColors: string[] = $state([]);
+  let heatmapLabels: string[] = $state([]);
 
-  onMount(async () => {
-    try {
-      abnormals = await getLatestAbnormalWithPrevious();
-    } catch (e) {
-      console.error('Failed to load abnormal results:', e);
-    }
-    loading = false;
+  const today = new Date();
+  const todayIso = isoDate(today);
+
+  function isoDate(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function fmtLongDate(d: Date): string {
+    return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  function greeting(d: Date): string {
+    const h = d.getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
+  function fmtMonth(iso: string): string {
+    return new Date(iso + 'T00:00').toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
+  }
+  function fmtDay(iso: string): string {
+    return String(new Date(iso + 'T00:00').getDate()).padStart(2, '0');
+  }
+
+  $effect(() => {
+    getDiagnoses().then((rows) => {
+      diagnoses = rows.filter((d) => !d.resolution_date);
+    });
+    getHeatmapConfig().then((c) => {
+      heatmapColors = c.colors;
+      heatmapLabels = c.labels;
+    });
+    getLatestAbnormalWithPrevious().then((rows) => {
+      abnormals = rows.slice(0, 5);
+    });
+    // Fetch this year plus last year to cover the trailing 7-day window across year boundaries.
+    const year = today.getFullYear();
+    Promise.all([getDailyRatings(year), getDailyRatings(year - 1)]).then(([a, b]) => {
+      ratings = [...a, ...b];
+    });
   });
 
-  function groupByPanel(results: AbnormalResult[]): Record<string, AbnormalResult[]> {
-    const groups: Record<string, AbnormalResult[]> = {};
-    for (const r of results) {
-      const panel = r.panel || 'Other';
-      if (!groups[panel]) groups[panel] = [];
-      groups[panel].push(r);
+  const last7 = $derived.by(() => {
+    const map = new Map(ratings.map((r) => [r.log_date, r]));
+    const dow = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    const out: { date: string; label: string; rating: DailyRating | null }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const iso = isoDate(d);
+      out.push({ date: iso, label: dow[d.getDay()], rating: map.get(iso) ?? null });
     }
-    return groups;
-  }
+    return out;
+  });
 
-  function changeInfo(r: AbnormalResult): { text: string; cssClass: string } {
-    if (r.value == null || r.prev_value == null) {
-      return { text: '--', cssClass: 'change-neutral' };
-    }
-    const delta = r.value - r.prev_value;
-    if (Math.abs(delta) < 0.001) {
-      return { text: '0', cssClass: 'change-neutral' };
-    }
+  const todayRating = $derived(last7[last7.length - 1]?.rating ?? null);
+  const fallbackRating = $derived.by(() => {
+    if (todayRating) return todayRating;
+    for (let i = last7.length - 2; i >= 0; i--) if (last7[i].rating) return last7[i].rating;
+    return null;
+  });
+  const wellnessLabel = $derived(
+    fallbackRating ? (heatmapLabels[fallbackRating.wellness_score - 1] ?? '') : 'Not logged'
+  );
+  const wellnessColor = $derived(
+    fallbackRating ? (heatmapColors[fallbackRating.wellness_score - 1] ?? 'var(--text-muted)') : 'var(--text-muted)'
+  );
+  const wellnessSub = $derived(
+    todayRating
+      ? 'Today, based on your last entry'
+      : fallbackRating
+        ? `As of ${fallbackRating.log_date}`
+        : 'Log today to see your wellness score'
+  );
 
-    const refLow = r.ref_range_low;
-    const refHigh = r.ref_range_high;
-
-    // Determine if moving closer to or further from the reference range midpoint
-    let improving = false;
-    if (refLow != null && refHigh != null) {
-      const mid = (refLow + refHigh) / 2;
-      improving = Math.abs(r.value - mid) < Math.abs(r.prev_value - mid);
-    } else if (refHigh != null) {
-      // Only upper bound — lower is better
-      improving = r.value < r.prev_value;
-    } else if (refLow != null) {
-      // Only lower bound — higher is better
-      improving = r.value > r.prev_value;
-    }
-
-    const sign = delta > 0 ? '+' : '';
-    const text = `${sign}${Number.isInteger(delta) ? delta : delta.toFixed(1)}`;
-    const cssClass = improving ? 'change-improving' : 'change-worsening';
-    return { text, cssClass };
-  }
-
-  let grouped = $derived(groupByPanel(abnormals));
+  const upcoming = upcomingCare(3);
 </script>
 
 <div class="dashboard">
-  <DiagnosisAccordion {onNavigate} />
   <div class="header">
-    <h1>Dashboard</h1>
-    <div class="header-actions">
-      <div class="size-controls">
-        <button class="size-btn" onclick={() => fontSize = Math.max(FONT_MIN, fontSize - 1)} disabled={fontSize <= FONT_MIN}>-</button>
-        <button class="size-btn" onclick={() => fontSize = Math.min(FONT_MAX, fontSize + 1)} disabled={fontSize >= FONT_MAX}>+</button>
-      </div>
-      <button class="primary" onclick={() => onNavigate('lab-entry')}>+ New Lab Entry</button>
-    </div>
+    <div class="date-line">{fmtLongDate(today)}</div>
+    <h1 class="greeting">{greeting(today)}</h1>
   </div>
 
-  {#if loading}
-    <p class="muted">Loading...</p>
-  {:else if abnormals.length === 0}
-    <div class="empty-state">
-      <p>No abnormal lab values found.</p>
-      <p class="muted">Enter lab results to see flagged values here.</p>
-    </div>
-  {:else}
-    <p class="summary">{abnormals.length} abnormal value{abnormals.length !== 1 ? 's' : ''} from latest results</p>
+  <div class="cards">
+    <section class="card wellness-card">
+      <header class="card-header">
+        <span class="eyebrow">WELLNESS</span>
+        <button class="link" onclick={() => onNavigate('daily-rating')}>Open daily log →</button>
+      </header>
+      <div class="wellness-word" style="color: {wellnessColor}">{wellnessLabel}</div>
+      <div class="wellness-sub">{wellnessSub}</div>
+      <div class="last7-label">LAST 7 DAYS</div>
+      <div class="last7">
+        {#each last7 as day}
+          <div class="last7-col">
+            <div class="last7-letter">{day.label}</div>
+            <div
+              class="last7-cell"
+              style="background: {day.rating && heatmapColors[day.rating.wellness_score - 1] ? heatmapColors[day.rating.wellness_score - 1] : 'var(--border)'}"
+            ></div>
+          </div>
+        {/each}
+      </div>
+    </section>
 
-    {#each Object.entries(grouped) as [panel, results]}
-      <div class="panel-group">
-        <h3>{panel}</h3>
-        <table style="font-size: {fontSize}px">
-          <thead>
-            <tr>
-              <th>Test</th>
-              <th>Value</th>
-              <th>Date</th>
-              <th>Previous</th>
-              <th>Change</th>
-              <th>Unit</th>
-              <th>Reference Range</th>
-              <th>Flag</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each results as r}
-              {@const change = changeInfo(r)}
-              <tr>
-                <td class="test-name">
-                  {r.test_name}
-                  <button class="info-btn" onclick={() => openGlossary(r.test_name)} title="View in glossary">i</button>
-                </td>
-                <td class="value {flagClass(r.flag)}">
-                  {#if r.value != null}
-                    {r.value}
-                  {:else}
-                    {r.text_value}
-                  {/if}
-                </td>
-                <td class="test-date">{formatDate(r.test_date)}</td>
-                <td class="prev-value">
-                  {#if r.prev_value != null}
-                    {r.prev_value}
-                  {:else if r.prev_text_value}
-                    {r.prev_text_value}
-                  {:else}
-                    <span class="muted">--</span>
-                  {/if}
-                </td>
-                <td class="change-cell {change.cssClass}">{change.text}</td>
-                <td class="unit">{r.unit}</td>
-                <td class="ref-range">
-                  {#if r.ref_range_low != null && r.ref_range_high != null}
-                    {r.ref_range_low} - {r.ref_range_high}
-                  {:else if r.ref_range_high != null}
-                    &lt; {r.ref_range_high}
-                  {:else if r.ref_range_low != null}
-                    &gt; {r.ref_range_low}
-                  {:else}
-                    --
-                  {/if}
-                </td>
-                <td><span class="badge {flagClass(r.flag)}">{r.flag}</span></td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
+    <section class="card diagnoses-card">
+      <header class="card-header">
+        <span class="eyebrow">ACTIVE DIAGNOSES</span>
+        <button class="link" onclick={() => onNavigate('care-team')}>Care team →</button>
+      </header>
+      {#if diagnoses.length === 0}
+        <div class="empty">No active diagnoses.</div>
+      {:else}
+        {#each diagnoses as d}
+          <div class="dx-row">
+            <div class="dx-main">
+              <div class="dx-name">
+                {d.name}
+                {#if d.short_name}<span class="dx-code">{d.short_name}</span>{/if}
+              </div>
+              <div class="dx-sub">
+                {#if d.onset_date}Since {d.onset_date}{/if}
+                {#if d.source} · {d.source}{/if}
+              </div>
+            </div>
+            {#if d.chronic}<span class="pill-tag">CHRONIC</span>{/if}
+          </div>
+        {/each}
+      {/if}
+    </section>
+
+    <section class="card upcoming-card">
+      <header class="card-header">
+        <span class="eyebrow">UPCOMING CARE</span>
+        <button class="link" onclick={() => onNavigate('care-team')}>See all →</button>
+      </header>
+      {#each upcoming as a}
+        <div class="up-row">
+          <div class="date-tile">
+            <div class="date-tile-mo">{fmtMonth(a.date)}</div>
+            <div class="date-tile-day">{fmtDay(a.date)}</div>
+          </div>
+          <div class="up-body">
+            <div class="up-title">{a.title}</div>
+            <div class="up-sub">{a.location}</div>
+          </div>
+        </div>
+      {/each}
+    </section>
+  </div>
+
+  <section class="card attention-card">
+    <header class="card-header">
+      <span class="eyebrow">
+        NEEDS ATTENTION
+        <span class="attention-count">{abnormals.length} abnormal values</span>
+      </span>
+      <button class="link" onclick={() => onNavigate('lab-results')}>View all labs →</button>
+    </header>
+    {#each abnormals as r}
+      <div class="attn-row">
+        <div class="attn-name">{r.test_name}</div>
+        <div class="attn-meta">
+          <span class="attn-date">{r.test_date}</span>
+          <span class="attn-value">{r.value ?? r.text_value}</span>
+          <span class="attn-unit">{r.unit}</span>
+          <span class="flag-pill" data-flag={r.flag}>{r.flag}</span>
+        </div>
       </div>
     {/each}
-  {/if}
+  </section>
 </div>
 
 <style>
-  .dashboard { max-width: 960px; }
+  .dashboard { max-width: 1160px; margin: 0 auto; padding: 24px 8px; }
+  .header { margin-bottom: 24px; }
+  .date-line { color: var(--text-muted); font-size: 13px; }
+  .greeting { font-family: var(--font-heading); font-size: 32px; font-weight: 900; margin-top: 4px; }
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 1000px) { .cards { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
   }
 
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--text-muted); text-transform: uppercase;
+  }
+  .link {
+    background: none; border: none; color: var(--primary);
+    font-size: 12px; font-weight: 600; cursor: pointer; padding: 0;
   }
 
-  .size-controls {
-    display: flex;
+  .wellness-word { font-family: var(--font-heading); font-size: 44px; font-weight: 900; line-height: 1; margin: 8px 0 4px; }
+  .wellness-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+  .last7-label { font-size: 10px; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+  .last7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .last7-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .last7-letter { font-size: 11px; color: var(--text-muted); }
+  .last7-cell { width: 100%; aspect-ratio: 1; border-radius: 6px; }
+
+  .dx-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; gap: 8px; }
+  .dx-name { font-weight: 600; }
+  .dx-code { font-weight: 500; color: var(--text-muted); margin-left: 6px; font-size: 12px; }
+  .dx-sub { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+  .empty { color: var(--text-muted); font-size: 13px; padding: 8px 0; }
+
+  .pill-tag {
+    background: color-mix(in oklab, var(--primary) 12%, transparent);
+    color: var(--primary);
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    padding: 3px 8px; border-radius: 999px;
   }
 
-  .size-btn {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: var(--font-mono);
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-muted);
-    cursor: pointer;
-  }
-
-  .size-btn:first-child {
-    border-radius: var(--radius) 0 0 var(--radius);
-  }
-
-  .size-btn:last-child {
-    border-radius: 0 var(--radius) var(--radius) 0;
-    margin-left: -1px;
-  }
-
-  .size-btn:hover:not(:disabled) {
-    background: var(--color-surface-raised);
-    color: var(--color-text);
-  }
-
-  .size-btn:disabled {
-    opacity: 0.4;
-    cursor: default;
-  }
-
-  .summary {
-    color: var(--color-text-muted);
-    margin-bottom: 16px;
-    font-size: 13px;
-  }
-
-  .muted { color: var(--color-text-muted); }
-
-  .empty-state {
-    padding: 40px;
+  .up-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+  .date-tile {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px 10px;
     text-align: center;
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius);
-    margin-top: 20px;
+    min-width: 46px;
   }
+  .date-tile-mo { font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em; }
+  .date-tile-day { font-family: var(--font-heading); font-weight: 700; font-size: 16px; }
+  .up-title { font-weight: 600; }
+  .up-sub { color: var(--text-muted); font-size: 12px; }
 
-  .panel-group {
-    margin-bottom: 20px;
+  .attention-count { color: var(--accent-bad); margin-left: 6px; }
+  .attn-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-top: 1px solid var(--border);
   }
-
-  .panel-group h3 {
-    margin-bottom: 8px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--color-border);
+  .attn-row:first-of-type { border-top: none; }
+  .attn-name { font-weight: 600; }
+  .attn-meta { display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 12px; }
+  .attn-value { font-family: var(--font-mono); color: var(--text); font-weight: 600; }
+  .flag-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 6px;
+    font-size: 11px; font-weight: 700; color: white;
   }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th {
-    text-align: left;
-    padding: 6px 10px;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  tbody tr:nth-child(even) {
-    background: #f9fafb;
-  }
-
-  td {
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .test-name {
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .value { font-family: var(--font-mono); }
-  .test-date { color: var(--color-text-muted); font-size: 12px; white-space: nowrap; }
-  .prev-value { font-family: var(--font-mono); color: var(--color-text-muted); font-size: 12px; }
-  .unit { color: var(--color-text-muted); }
-  .ref-range { color: var(--color-text-muted); font-family: var(--font-mono); font-size: 12px; }
-
-  .change-cell {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .change-improving { color: var(--color-success); }
-  .change-worsening { color: var(--color-danger); }
-  .change-neutral { color: var(--color-text-muted); font-weight: 400; }
+  .flag-pill[data-flag="H"], .flag-pill[data-flag="HH"] { background: var(--accent-high); }
+  .flag-pill[data-flag="L"], .flag-pill[data-flag="LL"] { background: var(--accent-low); }
 </style>
