@@ -12,7 +12,6 @@
   import Diagnoses from '$lib/views/Diagnoses.svelte';
   import Artifacts from '$lib/views/Artifacts.svelte';
   import LabManage from '$lib/views/LabManage.svelte';
-  import Export from '$lib/views/Export.svelte';
   import { getSetting, setSetting } from '$lib/db';
   import { applyTheme, parseThemeSetting } from '$lib/theme';
   import { getCurrentWindow } from '@tauri-apps/api/window';
@@ -24,7 +23,7 @@
   let settingsOpen = $state(false);
   let glossaryOpen = $state(false);
   let glossaryTest: string | null = $state(null);
-  type ActivePanel = 'labConfig' | 'export' | null;
+  type ActivePanel = 'labConfig' | null;
   let activePanel: ActivePanel = $state(null);
 
   type FontSize = 'sm' | 'md' | 'lg';
@@ -40,12 +39,10 @@
   const GLOSSARY_WIDTH = 340;
   const CONTENT_MAX = 960; // largest max-width among views
   const CONFIG_PANEL_WIDTH = 400;
-  const EXPORT_PANEL_WIDTH = 360;
 
   // Glossary fits inline when the body area is wide enough for both
   let glossaryInline = $derived(bodyWidth >= CONTENT_MAX + GLOSSARY_WIDTH + 48);
   let configPanelInline = $derived(bodyWidth >= CONTENT_MAX + CONFIG_PANEL_WIDTH + 48);
-  let exportPanelInline = $derived(bodyWidth >= CONTENT_MAX + EXPORT_PANEL_WIDTH + 48);
 
   function navigate(view: View, sessionId?: number | null) {
     currentView = view;
@@ -225,7 +222,7 @@
       {:else if currentView === 'daily-rating'}
         <DailyRating />
       {:else if currentView === 'documents'}
-        <Artifacts onNavigate={navigate} openExport={() => activePanel = 'export'} />
+        <Artifacts onNavigate={navigate} />
       {:else if currentView === 'care-team'}
         <Diagnoses />
       {/if}
@@ -243,11 +240,6 @@
       </div>
     {/if}
 
-    {#if activePanel === 'export' && exportPanelInline}
-      <div class="config-panel-inline" style="width: {EXPORT_PANEL_WIDTH}px">
-        <Export onClose={() => activePanel = null} />
-      </div>
-    {/if}
   </div>
 
   {#if glossaryOpen && !glossaryInline}
@@ -264,14 +256,6 @@
     <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
     <div class="panel-overlay" style="width: {CONFIG_PANEL_WIDTH}px">
       <LabManage onClose={() => activePanel = null} />
-    </div>
-  {/if}
-
-  {#if activePanel === 'export' && !exportPanelInline}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="panel-overlay-backdrop" onclick={() => activePanel = null} onkeydown={() => {}}></div>
-    <div class="panel-overlay" style="width: {EXPORT_PANEL_WIDTH}px">
-      <Export onClose={() => activePanel = null} />
     </div>
   {/if}
 

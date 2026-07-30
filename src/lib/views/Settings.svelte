@@ -1,6 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getSetting, setSetting } from '$lib/db';
+  import { getSetting, setSetting, exportData } from '$lib/db';
+  import { todayString } from '$lib/utils';
+  import { save } from '@tauri-apps/plugin-dialog';
+  import { writeTextFile } from '@tauri-apps/plugin-fs';
   import {
     PRESETS,
     DEFAULT_PRESET_ID,
@@ -118,6 +121,35 @@
     mcpWriteEnabled = !mcpWriteEnabled;
     await setSetting('mcp_write_enabled', mcpWriteEnabled ? 'true' : 'false');
   }
+
+  let exporting = $state(false);
+  let exportSuccess = $state(false);
+
+  async function handleExport(format: 'json' | 'csv') {
+    exporting = true;
+    try {
+      const oneYearAgo = (() => {
+        const d = new Date();
+        d.setFullYear(d.getFullYear() - 1);
+        return d.toISOString().slice(0, 10);
+      })();
+      const data = await exportData(oneYearAgo, todayString(), true, true, format);
+      const ext = format === 'json' ? 'json' : 'csv';
+      const filePath = await save({
+        defaultPath: `symptom-tracker-export.${ext}`,
+        filters: [{ name: format === 'json' ? 'JSON' : 'CSV', extensions: [ext] }],
+      });
+      if (filePath) {
+        await writeTextFile(filePath, data);
+        exportSuccess = true;
+        setTimeout(() => exportSuccess = false, 3000);
+      }
+    } catch (e) {
+      console.error('Export failed:', e);
+      alert('Export failed: ' + e);
+    }
+    exporting = false;
+  }
 </script>
 
 <div class="settings">
@@ -156,6 +188,22 @@
       {/each}
 
       <button onclick={resetOverrides}>Reset to preset defaults</button>
+    </section>
+
+    <section class="settings-section">
+      <h2>Export</h2>
+      <p class="row-note">Download all your data.</p>
+      <div class="button-row">
+        <button class="btn-primary btn-sm" onclick={() => handleExport('json')} disabled={exporting}>
+          {exporting ? 'Exporting…' : 'Export JSON'}
+        </button>
+        <button class="btn-primary btn-sm" onclick={() => handleExport('csv')} disabled={exporting}>
+          {exporting ? 'Exporting…' : 'Export CSV'}
+        </button>
+        {#if exportSuccess}
+          <span class="export-success">Saved successfully</span>
+        {/if}
+      </div>
     </section>
 
     <section class="section">
@@ -637,5 +685,14 @@
     letter-spacing: 0.06em;
     color: var(--text-muted, var(--color-text-muted));
     margin: 6px 0;
+  }
+
+  .row-note { color: var(--text-muted); font-size: 13px; margin-bottom: 8px; }
+  .button-row { display: flex; gap: 8px; align-items: center; }
+
+  .export-success {
+    color: var(--color-success);
+    font-size: 13px;
+    font-weight: 500;
   }
 </style>
