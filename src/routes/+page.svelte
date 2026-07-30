@@ -174,6 +174,16 @@
   function logToday() {
     navigate('daily-rating');
   }
+
+  function bumpFontSize(direction: 1 | -1) {
+    const order: FontSize[] = ['sm', 'md', 'lg'];
+    const idx = order.indexOf(fontSize);
+    const next = order[Math.max(0, Math.min(order.length - 1, idx + direction))];
+    if (next !== fontSize) {
+      fontSize = next;
+      setSetting('font_size', fontSize);
+    }
+  }
 </script>
 
 <div class="app-layout">
@@ -197,6 +207,10 @@
 
     <div class="topbar-actions">
       <button class="primary log-today" onclick={logToday}>+ Log today</button>
+      <div class="font-size-group">
+        <button class="icon-btn font-btn" onclick={() => bumpFontSize(-1)} disabled={fontSize === 'sm'} title="Smaller text (⌘−)">A−</button>
+        <button class="icon-btn font-btn" onclick={() => bumpFontSize(1)} disabled={fontSize === 'lg'} title="Larger text (⌘+)">A+</button>
+      </div>
       <button class="icon-btn" onclick={() => openGlossary()} title="Help">?</button>
       <button class="icon-btn" onclick={() => settingsOpen = true} title="Settings">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -370,6 +384,26 @@
   .icon-btn:hover {
     color: var(--text);
     border-color: var(--primary);
+  }
+
+  .icon-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .icon-btn:disabled:hover {
+    color: var(--text-muted);
+    border-color: var(--border);
+  }
+
+  .font-size-group { display: flex; gap: 4px; }
+
+  .font-btn {
+    width: auto;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-heading);
   }
 
   .body-area {

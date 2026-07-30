@@ -8,7 +8,7 @@
   } from '$lib/db';
   import { upcomingCare } from '$lib/demo';
 
-  let { onNavigate }: {
+  let { onNavigate, openGlossary }: {
     onNavigate: (view: View) => void;
     openGlossary?: (test?: string) => void;
   } = $props();
@@ -50,7 +50,7 @@
       heatmapLabels = c.labels;
     });
     getLatestAbnormalWithPrevious().then((rows) => {
-      abnormals = rows.slice(0, 5);
+      abnormals = rows;
     });
     // Fetch this year plus last year to cover the trailing 7-day window across year boundaries.
     const year = today.getFullYear();
@@ -179,7 +179,12 @@
     </header>
     {#each abnormals as r}
       <div class="attn-row">
-        <div class="attn-name">{r.test_name}</div>
+        <div class="attn-name">
+          {r.test_name}
+          {#if openGlossary}
+            <button class="info-btn" onclick={() => openGlossary?.(r.test_name)} title="About this test">?</button>
+          {/if}
+        </div>
         <div class="attn-meta">
           <span class="attn-date">{r.test_date}</span>
           <span class="attn-value">{r.value ?? r.text_value}</span>
@@ -260,7 +265,7 @@
   .attn-row:first-of-type { border-top: none; }
   .attn-name { font-weight: 600; }
   .attn-meta { display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 12px; }
-  .attn-value { font-family: var(--font-mono); color: var(--text); font-weight: 600; }
+  .attn-value { font-family: var(--font-mono); color: var(--text); font-weight: 600; font-size: 15px; }
   .flag-pill {
     display: inline-flex; align-items: center; justify-content: center;
     width: 22px; height: 22px; border-radius: 6px;
