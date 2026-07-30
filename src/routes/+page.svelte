@@ -9,7 +9,7 @@
   import Glossary from '$lib/views/Glossary.svelte';
   import Welcome from '$lib/views/Welcome.svelte';
   import Settings from '$lib/views/Settings.svelte';
-  import Diagnoses from '$lib/views/Diagnoses.svelte';
+  import CareTeam from '$lib/views/CareTeam.svelte';
   import Documents from '$lib/views/Documents.svelte';
   import LabManage from '$lib/views/LabManage.svelte';
   import { getSetting, setSetting } from '$lib/db';
@@ -224,7 +224,7 @@
       {:else if currentView === 'documents'}
         <Documents onNavigate={navigate} />
       {:else if currentView === 'care-team'}
-        <Diagnoses />
+        <CareTeam />
       {/if}
     </main>
 
