@@ -1,6 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getSetting, setSetting } from '$lib/db';
+  import { getSetting, setSetting, exportData } from '$lib/db';
+  import { todayString } from '$lib/utils';
+  import { save } from '@tauri-apps/plugin-dialog';
+  import { writeTextFile } from '@tauri-apps/plugin-fs';
+  import {
+    PRESETS,
+    DEFAULT_PRESET_ID,
+    parseThemeSetting,
+    serializeThemeSetting,
+    applyTheme,
+    type TokenKey,
+    type ThemeSetting,
+  } from '$lib/theme';
 
   type FontSize = 'sm' | 'md' | 'lg';
   let { onClose, fontSize = 'md', onFontSizeChange }: {
@@ -9,25 +21,77 @@
     onFontSizeChange?: (size: FontSize) => void;
   } = $props();
 
+  let theme: ThemeSetting = $state({ preset: DEFAULT_PRESET_ID, overrides: {} });
+  let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const TOKEN_GROUPS: { label: string; keys: TokenKey[] }[] = [
+    { label: 'Surfaces', keys: ['--bg', '--surface', '--border'] },
+    { label: 'Text', keys: ['--text', '--text-muted'] },
+    { label: 'Brand', keys: ['--primary', '--primary-contrast'] },
+    { label: 'Accents', keys: ['--accent-high', '--accent-low', '--accent-good', '--accent-bad'] },
+  ];
+
+  const TOKEN_LABELS: Record<TokenKey, string> = {
+    '--bg': 'Background',
+    '--surface': 'Card surface',
+    '--border': 'Border',
+    '--text': 'Text',
+    '--text-muted': 'Muted text',
+    '--primary': 'Primary',
+    '--primary-contrast': 'Primary contrast',
+    '--accent-high': 'High flag',
+    '--accent-low': 'Low flag',
+    '--accent-good': 'Good',
+    '--accent-bad': 'Bad',
+  };
+
+  $effect(() => {
+    getSetting('theme').then((raw) => {
+      theme = parseThemeSetting(raw);
+    });
+  });
+
+  function currentValue(key: TokenKey): string {
+    if (theme.overrides[key]) return theme.overrides[key]!;
+    const preset = PRESETS.find((p) => p.id === theme.preset) ?? PRESETS[0];
+    return preset.tokens[key];
+  }
+
+  function scheduleSave() {
+    applyTheme(document.documentElement, theme);
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      setSetting('theme', serializeThemeSetting(theme));
+    }, 200);
+  }
+
+  function selectPreset(id: string) {
+    theme = { preset: id, overrides: {} };
+    scheduleSave();
+  }
+
+  function setOverride(key: TokenKey, value: string) {
+    theme = { ...theme, overrides: { ...theme.overrides, [key]: value } };
+    scheduleSave();
+  }
+
+  function resetOverrides() {
+    theme = { ...theme, overrides: {} };
+    scheduleSave();
+  }
+
   let mcpEnabled = $state(true);
   let mcpWriteEnabled = $state(false);
   let loading = $state(true);
   let setupExpanded = $state(true);
-  let apiKeyValue = $state('');
-  let chatEnabledValue = $state(true);
-  let apiKeySaved = $state(false);
 
   onMount(async () => {
-    const [readVal, writeVal, apiKeyResult, chatEnabledResult] = await Promise.all([
+    const [readVal, writeVal] = await Promise.all([
       getSetting('mcp_enabled'),
       getSetting('mcp_write_enabled'),
-      getSetting('anthropic_api_key'),
-      getSetting('chat_enabled'),
     ]);
     mcpEnabled = readVal === 'true';
     mcpWriteEnabled = writeVal === 'true';
-    apiKeyValue = apiKeyResult;
-    chatEnabledValue = chatEnabledResult === 'true';
     loading = false;
 
     function handleKeydown(e: KeyboardEvent) {
@@ -50,6 +114,35 @@
     mcpWriteEnabled = !mcpWriteEnabled;
     await setSetting('mcp_write_enabled', mcpWriteEnabled ? 'true' : 'false');
   }
+
+  let exporting = $state(false);
+  let exportSuccess = $state(false);
+
+  async function handleExport(format: 'json' | 'csv') {
+    exporting = true;
+    try {
+      const oneYearAgo = (() => {
+        const d = new Date();
+        d.setFullYear(d.getFullYear() - 1);
+        return d.toISOString().slice(0, 10);
+      })();
+      const data = await exportData(oneYearAgo, todayString(), true, true, format);
+      const ext = format === 'json' ? 'json' : 'csv';
+      const filePath = await save({
+        defaultPath: `symptom-tracker-export.${ext}`,
+        filters: [{ name: format === 'json' ? 'JSON' : 'CSV', extensions: [ext] }],
+      });
+      if (filePath) {
+        await writeTextFile(filePath, data);
+        exportSuccess = true;
+        setTimeout(() => exportSuccess = false, 3000);
+      }
+    } catch (e) {
+      console.error('Export failed:', e);
+      alert('Export failed: ' + e);
+    }
+    exporting = false;
+  }
 </script>
 
 <div class="settings">
@@ -59,6 +152,53 @@
   </div>
 
   <div class="settings-body">
+    <section class="settings-section">
+      <h2>Theme</h2>
+
+      <label class="row">
+        <span>Preset</span>
+        <select value={theme.preset} onchange={(e) => selectPreset((e.currentTarget as HTMLSelectElement).value)}>
+          {#each PRESETS as preset}
+            <option value={preset.id}>{preset.label}</option>
+          {/each}
+        </select>
+      </label>
+
+      {#each TOKEN_GROUPS as group}
+        <div class="token-group">
+          <div class="token-group-label">{group.label}</div>
+          {#each group.keys as key}
+            <label class="row">
+              <span>{TOKEN_LABELS[key]}</span>
+              <input
+                type="color"
+                value={currentValue(key)}
+                oninput={(e) => setOverride(key, (e.currentTarget as HTMLInputElement).value)}
+              />
+            </label>
+          {/each}
+        </div>
+      {/each}
+
+      <button onclick={resetOverrides}>Reset to preset defaults</button>
+    </section>
+
+    <section class="settings-section">
+      <h2>Export</h2>
+      <p class="row-note">Download all your data.</p>
+      <div class="button-row">
+        <button class="btn-primary btn-sm" onclick={() => handleExport('json')} disabled={exporting}>
+          {exporting ? 'Exporting…' : 'Export JSON'}
+        </button>
+        <button class="btn-primary btn-sm" onclick={() => handleExport('csv')} disabled={exporting}>
+          {exporting ? 'Exporting…' : 'Export CSV'}
+        </button>
+        {#if exportSuccess}
+          <span class="export-success">Saved successfully</span>
+        {/if}
+      </div>
+    </section>
+
     <section class="section">
       <h3>Appearance</h3>
       <div class="field-label" style="margin-bottom: 8px;">Text size</div>
@@ -78,51 +218,6 @@
       </span>
     </section>
 
-    <section class="section">
-      <h3>AI Assistant</h3>
-      <div class="toggle-row">
-        <button
-          class="toggle"
-          class:on={chatEnabledValue}
-          onclick={async () => { chatEnabledValue = !chatEnabledValue; await setSetting('chat_enabled', chatEnabledValue ? 'true' : 'false'); }}
-          role="switch"
-          aria-checked={chatEnabledValue}
-          aria-label="Toggle AI chat"
-          disabled={loading}
-        >
-          <span class="toggle-knob"></span>
-        </button>
-        <div class="toggle-label">
-          <span class="toggle-title">Enable AI chat panel</span>
-          <span class="toggle-subtitle">Show the chat assistant toggle in the toolbar.</span>
-        </div>
-      </div>
-
-      <div class="api-key-row" style="margin-top: 14px;">
-        <label for="anthropic-api-key" class="field-label">Anthropic API key</label>
-        <div class="api-key-input-row">
-          <input
-            id="anthropic-api-key"
-            type="password"
-            bind:value={apiKeyValue}
-            placeholder="sk-ant-..."
-            class="api-key-input"
-            autocomplete="off"
-          />
-          <button
-            class="btn-primary btn-sm"
-            onclick={async () => {
-              await setSetting('anthropic_api_key', apiKeyValue);
-              apiKeySaved = true;
-              setTimeout(() => apiKeySaved = false, 2000);
-            }}
-          >
-            {apiKeySaved ? 'Saved ✓' : 'Save'}
-          </button>
-        </div>
-        <span class="toggle-subtitle">Stored locally in your app database. Never sent anywhere except api.anthropic.com.</span>
-      </div>
-    </section>
 
     <section class="section">
       <h3>MCP Access</h3>
@@ -422,28 +517,6 @@
     margin-bottom: 4px;
   }
 
-  .api-key-row {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .api-key-input-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .api-key-input {
-    flex: 1;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 6px 10px;
-    font-size: 13px;
-    color: var(--color-text);
-    font-family: var(--font-mono);
-  }
-
   .btn-primary {
     background: var(--color-accent);
     color: white;
@@ -500,5 +573,52 @@
     border-color: var(--color-accent);
     z-index: 1;
     position: relative;
+  }
+
+  .settings-section {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .settings-section h2 {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+
+  .row span {
+    color: var(--text-muted, var(--color-text-muted));
+    font-size: 13px;
+  }
+
+  .token-group {
+    margin: 12px 0;
+  }
+
+  .token-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted, var(--color-text-muted));
+    margin: 6px 0;
+  }
+
+  .row-note { color: var(--text-muted); font-size: 13px; margin-bottom: 8px; }
+  .button-row { display: flex; gap: 8px; align-items: center; }
+
+  .export-success {
+    color: var(--color-success);
+    font-size: 13px;
+    font-weight: 500;
   }
 </style>

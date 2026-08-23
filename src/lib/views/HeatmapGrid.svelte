@@ -74,14 +74,14 @@
     table-layout: fixed;
   }
   .corner {
-    width: 28px;
+    width: 24px;
   }
   .month-header {
-    width: 36px;
+    width: 24px;
     padding: 0 2px 4px;
     text-align: center;
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #6b7280);
+    font-size: 0.7rem;
+    color: var(--text-muted);
     white-space: nowrap;
   }
   .month-header span {
@@ -93,22 +93,22 @@
   .day-label {
     padding: 1px 6px 1px 0;
     text-align: right;
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #6b7280);
-    width: 28px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    width: 24px;
   }
   .cell {
     padding: 1px;
-    width: 36px;
-    height: 28px;
+    width: 24px;
+    height: 20px;
   }
   .cell button {
     display: block;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--color-border, #e5e7eb);
+    border: 1px solid var(--border);
     border-radius: 3px;
-    background: var(--color-surface-raised, #f3f4f6);
+    background: var(--surface);
     cursor: pointer;
     padding: 0;
     transition: opacity 0.1s, transform 0.1s;
@@ -116,7 +116,7 @@
   .cell button:hover {
     opacity: 0.8;
     transform: scale(1.1);
-    border-color: var(--color-border-strong, #d1d5db);
+    border-color: var(--border);
   }
   .cell.invalid button {
     display: none;
@@ -125,11 +125,11 @@
     background: transparent;
   }
   .cell.today button {
-    outline: 2px solid var(--color-accent, #2E6171);
+    outline: 2px solid var(--primary);
     outline-offset: 1px;
   }
   .cell.selected button {
-    outline: 2px solid var(--color-text, #1a1a1a);
+    outline: 2px solid var(--text);
     outline-offset: 1px;
   }
 </style>

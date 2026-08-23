@@ -4,9 +4,8 @@
   import DiagnosisAccordion from '$lib/components/DiagnosisAccordion.svelte';
   import type { Artifact, ExtractionResult, LabSession, LabResult, View } from '$lib/types';
 
-  let { onNavigate, openExport }: {
+  let { onNavigate }: {
     onNavigate: (view: View) => void;
-    openExport: () => void;
   } = $props();
 
   let artifacts = $state<Artifact[]>([]);
@@ -102,15 +101,8 @@
   <DiagnosisAccordion {onNavigate} />
 
   <div class="view-header">
-    <h1>Artifacts</h1>
+    <h1>Documents</h1>
     <div class="header-actions">
-      <button class="configure-btn" onclick={openExport}>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-        </svg>
-        Export
-      </button>
       <button class="btn-primary" onclick={() => showAdd = true}>+ Add</button>
     </div>
   </div>
@@ -186,7 +178,10 @@
   {/if}
 
   {#if artifacts.length === 0 && !showAdd}
-    <p class="empty">No artifacts yet. Add an after-visit summary or lab report to get started.</p>
+    <div class="empty-state">
+      <div class="empty-title">No documents yet</div>
+      <div class="empty-body">Paste text or upload a file to save it here.</div>
+    </div>
   {/if}
 
   <div class="artifact-list">
@@ -219,25 +214,6 @@
     gap: 8px;
   }
 
-  .configure-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    background: var(--color-surface);
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-  }
-
-  .configure-btn:hover {
-    background: var(--color-surface-raised);
-    color: var(--color-text);
-    border-color: var(--color-border-strong);
-  }
   .add-card { background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
   .field label { font-size: 12px; font-weight: 500; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
   .field input { width: 100%; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 6px 10px; font-size: 13px; color: var(--color-text); box-sizing: border-box; }
@@ -268,7 +244,13 @@
   .flag-h, .flag-hh { color: #e05555; }
   .flag-l, .flag-ll { color: #e09055; }
   .more-results { font-size: 11px; color: var(--color-text-muted); text-align: center; padding: 4px; }
-  .empty { color: var(--color-text-muted); font-size: 14px; }
+  .empty-state {
+    padding: 40px 20px; text-align: center;
+    border: 1px dashed var(--border, var(--color-border)); border-radius: 12px;
+    background: var(--surface, var(--color-surface-raised));
+  }
+  .empty-title { font-family: var(--font-heading); font-weight: 700; font-size: 18px; }
+  .empty-body { color: var(--text-muted, var(--color-text-muted)); margin-top: 6px; }
   .artifact-list { display: flex; flex-direction: column; gap: 6px; }
   .artifact-row { display: flex; align-items: center; justify-content: space-between; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 6px; padding: 10px 14px; }
   .artifact-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }

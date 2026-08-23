@@ -32,7 +32,7 @@ export default defineConfig(async () => ({
   },
   test: {
     include: ['src/**/*.{test,spec}.{js,ts}'],
-    environment: 'node',
+    environment: 'happy-dom',
     alias: {
       '$lib': '/src/lib',
       '$lib/': '/src/lib/',

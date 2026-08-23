@@ -141,9 +141,9 @@
   }
   .year-nav button {
     background: none;
-    border: 1px solid var(--color-border, #e5e7eb);
+    border: 1px solid var(--border);
     border-radius: 4px;
-    color: var(--color-text, #1a1a1a);
+    color: var(--text);
     width: 28px;
     height: 28px;
     cursor: pointer;
@@ -155,8 +155,8 @@
     line-height: 1;
   }
   .year-nav button:hover {
-    background: var(--color-surface-raised, #f9fafb);
-    border-color: var(--color-border-strong, #d1d5db);
+    background: var(--surface);
+    border-color: var(--border);
   }
   .year-nav button:disabled {
     opacity: 0.35;
@@ -167,13 +167,13 @@
     font-weight: 600;
     min-width: 52px;
     text-align: center;
-    color: var(--color-text, #1a1a1a);
+    color: var(--text);
   }
   .config-toggle {
     background: none;
-    border: 1px solid var(--color-border, #e5e7eb);
+    border: 1px solid var(--border);
     border-radius: 6px;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--text-muted);
     width: 32px;
     height: 32px;
     cursor: pointer;
@@ -181,9 +181,9 @@
     padding: 0;
   }
   .config-toggle:hover, .config-toggle.active {
-    color: var(--color-text, #1a1a1a);
-    border-color: var(--color-border-strong, #d1d5db);
-    background: var(--color-surface-raised, #f9fafb);
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface);
   }
   .error-msg {
     color: var(--color-danger, #7B0828);
@@ -209,6 +209,6 @@
   }
   .no-selection {
     font-size: 0.85rem;
-    color: var(--color-text-muted, #6b7280);
+    color: var(--text-muted);
   }
 </style>

@@ -36,7 +36,7 @@
           </div>
         {/each}
         <div class="accordion-footer">
-          <button class="link-btn" onclick={() => onNavigate('diagnoses')}>Edit in Profile →</button>
+          <button class="link-btn" onclick={() => onNavigate('care-team')}>Edit in Profile →</button>
         </div>
       </div>
     {/if}
